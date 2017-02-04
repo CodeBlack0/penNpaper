@@ -28,8 +28,6 @@ class Data():
          for data in race_data['talents']:
            if data.text in self.talents:
              race['talents'].append(self.talents.index(data.text))
-         # Parsing base_stats
-         
          # Adding Race to race_dict
          self.races[child.tag] = race
    
