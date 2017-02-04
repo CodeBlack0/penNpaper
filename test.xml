@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<data>
+  <stats>
+    <string>
+      <name>Dieter</name>
+      <race>ork</race>
+    </string>
+    <numeric>
+      <rolled>
+		    <strength>1</strength>
+		    <dexterity>2</dexterity>
+		    <consitution>3</consitution>
+		    <intelligence>4</intelligence>
+		    <wisdom>5</wisdom>
+		    <charsima>6</charsima>
+      </rolled>
+      <other>
+		    <health>10</health>
+		    <mana>10</mana>
+      </other>
+    </numeric>
+  </stats>
+</data>

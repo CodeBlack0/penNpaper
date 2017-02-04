@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<data>
+  <races>
+    <human>
+      <talents>
+        <talent>Dunkel Sicht</talent>
+        <talent>Stupid</talent>
+        <talent>Defensive Training</talent>
+      </talents>
+    </human>
+    <ork>
+      <talents>
+        <talent>Hyper Intellegent</talent>
+      </talents>
+    </ork>
+  </races>
+  <talents>
+    <talent>Dunkel Sicht</talent>
+    <talent>Defensive Training</talent>
+    <talent>Stupid</talent>
+    <talent>Hyper Intellegent</talent>
+  </talents>
+</data>
