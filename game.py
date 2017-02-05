@@ -220,30 +220,30 @@ class Equipable(Item):
             if tree in self.data and str(level) in self.data['upgradepath'][tree]:
                 self.data[tree] = self.data[tree] + " (" + self.data['upgradepath'][tree][str(level)] + ")"
 
-    def reapply_levels(self, limit=False):
+    def apply_levels(self, limit=False):
         if not limit:
-            limit = self.data['level']
-        for level in range(1,limit+1):
-            self.level_up(level)
+            limit = 1
+        for level in range(self.data['level'], self.data['level']+limit):
+            if level != 1: self.level_up(level)
 
 class Weapon(Equipable):
-    def __init__(self, id, item_data, weapon_data, size='medium', level=1):
+    def __init__(self, id, item_data, weapon_data, size='medium', level=0):
         super().__init__(id, item_data, level, upgrade_path=weapon_data['upgradepath'], equiptime=weapon_data['equiptime'])
         self.data['size'] = size
         self.data['weapon_type'] = weapon_data['type']
         self.data['base_damage'] = weapon_data['damage']
         self.data['damage'] = weapon_data['damage'][size]
         self.data['range'] = weapon_data['range']
-        self.reapply_levels(level)
+        self.apply_levels(level)
 
 class Equipment(Equipable):
-    def __init__(self, id, item_data, equipment_data, level=1):
+    def __init__(self, id, item_data, equipment_data, level=0):
         super().__init__(id, item_data, level, upgrade_path=equipment_data['upgradepath'], equiptime=equipment_data['equiptime'])
         self.data['spellfailing'] = equipment_data['spellfailing']
         self.data['armordeficit'] = equipment_data['armordeficit']
         self.data['maxdexbonus'] = equipment_data['maxdexbonus']
         self.data['armor'] = equipment_data['armor']
-        self.reapply_levels(level)
+        self.apply_levels(1)
 
 ######################################################################
 class Player():
@@ -282,16 +282,24 @@ player = Player("test.xml")
 data = Data()
 
 irondagger = data.weapon(4)
-irondagger.reapply_levels(5)
+irondagger.apply_levels(5)
 print(str(irondagger.data['level']) + " lvl | " +  irondagger.data['name'] + "\n" +
       irondagger.data['special_text'] + "\n" +
       irondagger.data['damage'])
+print("----------------------------------------")
 
 leathershoulders = data.equipment(5)
 print(str(leathershoulders.data['level']) + " lvl | " +  leathershoulders.data['name'] + "\n" +
       leathershoulders.data['special_text'] + "\n" +
       leathershoulders.data['armor'])
-leathershoulders.reapply_levels(2)
+print("----------------------------------------")
+leathershoulders.apply_levels(2)
 print(str(leathershoulders.data['level']) + " lvl | " +  leathershoulders.data['name'] + "\n" +
       leathershoulders.data['special_text'] + "\n" +
       leathershoulders.data['armor'])
+print("----------------------------------------")
+leathershoulders.level_up("GODHOOD")
+print(str(leathershoulders.data['level']) + " lvl | " +  leathershoulders.data['name'] + "\n" +
+      leathershoulders.data['special_text'] + "\n" +
+      leathershoulders.data['armor'])
+print("----------------------------------------")
