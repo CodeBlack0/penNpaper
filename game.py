@@ -60,8 +60,8 @@ class Data():
         # Parsing Item data
         item['name'] = data['name'].text
         item['special_text'] = data['special_text'].text
-        item['price'] = self.calc_price(float(data['price'].text), data['price'].attrib['scale'])
-        item['weight'] = self.calc_weight(float(data['weight'].text), data['weight'].attrib['scale'])
+        item['price'] = str(self.calc_price(float(data['price'].text), data['price'].attrib['scale']))
+        item['weight'] = str(self.calc_weight(float(data['weight'].text), data['weight'].attrib['scale']))
         item['durability'] = int(data['durability'].text)
         return item
 
@@ -84,7 +84,8 @@ class Data():
         weapon['damage'] = {'very_small': data['damage'].attrib['very_small'],
                             'small': data['damage'].attrib['small'],
                             'medium': data['damage'].attrib['medium'],
-                            'big': data['damage'].attrib['big']}
+                            'big': data['damage'].attrib['big'],
+                            'type': data['damage'].attrib['type']}
         weapon['range'] = str(self.calc_length(float(data['range'].text), data['range'].attrib['scale']))
         weapon['equiptime'] = str(self.calc_time(float(data['equiptime'].text), data['equiptime'].attrib['scale']))
         weapon['upgradepath'] = {}
@@ -232,9 +233,25 @@ class Weapon(Equipable):
         self.data['size'] = size
         self.data['weapon_type'] = weapon_data['type']
         self.data['base_damage'] = weapon_data['damage']
+        self.data['damage_type'] = weapon_data['damage']['type']
         self.data['damage'] = weapon_data['damage'][size]
         self.data['range'] = weapon_data['range']
         self.apply_levels(level)
+
+    def print_data(self):
+        print(str(self.data['level']) + " lvl | " + self.data['name'] + " | durability: " + str(self.data['durability']) +
+              "\n Weight: " + self.data['weight'] +
+              "\n Price: " + self.data['price'] +
+              "\n Specialtext: " + self.data['special_text'] +
+              "\n Damage: " + self.data['damage'] +
+              "\n Size: " + self.data['size'] +
+              "\n Weapontype: " + str(self.data['weapon_type']) +
+              "\n Damagetype: " + self.data['damage_type'] +
+              "\n Range: " + self.data['range'] +
+              "\n Upgradepaths: ")
+        for path in self.data['upgradepath']:
+            print("   " + path + ": " + str(self.data['upgradepath'][path]))
+
 
 class Equipment(Equipable):
     def __init__(self, id, item_data, equipment_data, level=0):
@@ -245,9 +262,25 @@ class Equipment(Equipable):
         self.data['armor'] = equipment_data['armor']
         self.apply_levels(1)
 
+    def print_data(self):
+        print(str(self.data['level']) + " lvl | " + self.data['name'] + " | durability: " + str(self.data['durability']) +
+              "\n Weight: " + self.data['weight'] +
+              "\n Price: " + self.data['price'] +
+              "\n Specialtext: " + self.data['special_text'] +
+              "\n Armor: " + self.data['armor'] +
+              "\n Spellfailing chance: " + self.data['spellfailing'] +
+              "\n Armordeficit: " + self.data['armordeficit'] +
+              "\n Maximum Dexterity Bonus: " + self.data['maxdexbonus'] +
+              "\n Upgradepaths: ")
+        for path in self.data['upgradepath']:
+            print("   " + path + ": " + str(self.data['upgradepath'][path]))
+
 ######################################################################
 class Player():
     def __init__(self, path=False):
+        self.inventory = []
+        self.weapons = []
+        self.equipment = []
         if isinstance(path, str):
             tree = ET.parse(path)
             root = tree.getroot()
@@ -273,9 +306,6 @@ class Player():
         for k in self.data:
             print(k + ": " + str(self.data[k]))
 
-    def get_data(self):
-        return self.data
-
 
 ######################################################################
 player = Player("test.xml")
@@ -283,20 +313,14 @@ data = Data()
 
 irondagger = data.weapon(4)
 irondagger.apply_levels(5)
-print(str(irondagger.data['level']) + " lvl | " +  irondagger.data['name'] + "\n" +
-      irondagger.data['special_text'] + "\n" +
-      irondagger.data['damage'])
+irondagger.print_data()
 print("----------------------------------------")
 
 leathershoulders = data.equipment(5)
-print(str(leathershoulders.data['level']) + " lvl | " +  leathershoulders.data['name'] + "\n" +
-      leathershoulders.data['special_text'] + "\n" +
-      leathershoulders.data['armor'])
+leathershoulders.print_data()
 print("----------------------------------------")
 leathershoulders.apply_levels(2)
-print(str(leathershoulders.data['level']) + " lvl | " +  leathershoulders.data['name'] + "\n" +
-      leathershoulders.data['special_text'] + "\n" +
-      leathershoulders.data['armor'])
+leathershoulders.print_data()
 print("----------------------------------------")
 leathershoulders.level_up("GODHOOD")
 print(str(leathershoulders.data['level']) + " lvl | " +  leathershoulders.data['name'] + "\n" +
