@@ -1,5 +1,5 @@
 import xml.etree.ElementTree as ET
-from enum import Enum
+from itertools import count
 
 
 ######################################################################
@@ -136,7 +136,7 @@ class Data():
     def calc_price(self, val, scale):
         return val * {"g": 10000,
                       "s": 100,
-                      "k": 1}.get(scale, 1)
+                      "c": 1}.get(scale, 1)
 
     # Berechnet Gewichte in einheitliche Werte
     def calc_weight(self, val, scale):
@@ -195,12 +195,19 @@ class Data():
         for name, data in self.talents.items():
             print("<name: " + name + ">\n--> Data: " + str(data))
 
+    def print_intanciated_items(self):
+        for key, item in Item.instances.items():
+            print(str(key) + " --> " + item.data['name'])
 
 #####################################################################
 class Item():
-    def __init__(self, id, item_data):
+    instances = {}
+
+    def __init__(self, item_id, item_data):
         self.data = item_data
-        self.data['id'] = id
+        self.data['id'] = item_id
+        self.uuid = id(self)
+        Item.instances[self.uuid] = self
 
     def sub_durability(self, val): self.data['durability'] -= val
 
@@ -239,6 +246,7 @@ class Weapon(Equipable):
         self.apply_levels(level)
 
     def print_data(self):
+        print("Item->Equipable->Weapon | uuid: <" + str(self.uuid) + "> | itemid: <" + str(self.data['id']) + ">")
         print(str(self.data['level']) + " lvl | " + self.data['name'] + " | durability: " + str(self.data['durability']) +
               "\n Weight: " + self.data['weight'] +
               "\n Price: " + self.data['price'] +
@@ -263,6 +271,7 @@ class Equipment(Equipable):
         self.apply_levels(1)
 
     def print_data(self):
+        print("Item->Equipable->Equipment | uuid: <" + str(self.uuid) + "> | itemid: <" + str(self.data['id']) + ">")
         print(str(self.data['level']) + " lvl | " + self.data['name'] + " | durability: " + str(self.data['durability']) +
               "\n Weight: " + self.data['weight'] +
               "\n Price: " + self.data['price'] +
@@ -306,6 +315,28 @@ class Player():
         for k in self.data:
             print(k + ": " + str(self.data[k]))
 
+    def add_item_to_inventory(self, item):
+        if isinstance(item, Item):
+            self.inventory.append(item)
+
+    def equip_item(self, item):
+        if isinstance(item, Weapon) and len(self.weapons) <= 6:
+            self.weapons.append(item)
+            return True
+        if isinstance(item, Equipment) and len(self.equipment) <= 4:
+            self.equipment.append(item)
+            return True
+        else: return False
+
+    def equip_from_inventory_by_index(self, index):
+        return self.equip_item(self.inventory.pop(index))
+
+    def equip_from_inventory_by_uuid(self, uuid):
+        for index, item in enumerate(self.inventory):
+            if uuid == item.uuid:
+                return self.equip_item(self.inventory.pop(index))
+                break
+        return False
 
 ######################################################################
 player = Player("test.xml")
@@ -315,7 +346,6 @@ irondagger = data.weapon(4)
 irondagger.apply_levels(5)
 irondagger.print_data()
 print("----------------------------------------")
-
 leathershoulders = data.equipment(5)
 leathershoulders.print_data()
 print("----------------------------------------")
@@ -323,7 +353,6 @@ leathershoulders.apply_levels(2)
 leathershoulders.print_data()
 print("----------------------------------------")
 leathershoulders.level_up("GODHOOD")
-print(str(leathershoulders.data['level']) + " lvl | " +  leathershoulders.data['name'] + "\n" +
-      leathershoulders.data['special_text'] + "\n" +
-      leathershoulders.data['armor'])
+leathershoulders.print_data()
 print("----------------------------------------")
+print(Item.instances)
