@@ -1,15 +1,15 @@
 <?xml version="1.0"?>
 <races>
     <race name="Human">
-      <talents>
-        <talent>Dunkel Sicht</talent>
-        <talent>Stupid</talent>
-        <talent>Defensive Training</talent>
-      </talents>
+        <talents>
+            <talent>Dunkel Sicht</talent>
+            <talent>Stupid</talent>
+            <talent>Defensive Training</talent>
+        </talents>
     </race>
     <race name="Ork">
-      <talents>
-        <talent>Hyper Intellegent</talent>
-      </talents>
+        <talents>
+            <talent>Hyper Intellegent</talent>
+        </talents>
     </race>
 </races>

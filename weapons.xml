@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<weapons>
+    <weapon item_id="4">
+        <type hands="1" ranged="0"></type>
+        <damage very_small="1d2" small="2d2" medium="3d2" big="1d6"></damage>
+        <crit type="1d2" mul="2"></crit>
+        <range scale="m">1</range>
+        <equiptime scale="t">1</equiptime>
+    </weapon>
+</weapons>
