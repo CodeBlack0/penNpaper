@@ -85,8 +85,8 @@ class Data():
                             'small': data['damage'].attrib['small'],
                             'medium': data['damage'].attrib['medium'],
                             'big': data['damage'].attrib['big']}
-        weapon['range'] = self.calc_length(float(data['range'].text), data['range'].attrib['scale'])
-        weapon['equiptime'] = self.calc_time(float(data['equiptime'].text), data['equiptime'].attrib['scale'])
+        weapon['range'] = str(self.calc_length(float(data['range'].text), data['range'].attrib['scale']))
+        weapon['equiptime'] = str(self.calc_time(float(data['equiptime'].text), data['equiptime'].attrib['scale']))
         weapon['upgradepath'] = {}
         for upgradetree in data['upgradepath']:
             tree = {}
@@ -109,11 +109,11 @@ class Data():
         data = self.reparse_nodes(raw_data)
         equipment = {}
         # Parsing Equipment data
-        equipment['spellfailing'] = int(data['spellfailing'].text)
-        equipment['armordeficit'] = int(data['armordeficit'].text)
-        equipment['maxdexbonus'] = int(data['maxdexbonus'].text)
-        equipment['armor'] = int(data['armor'].text)
-        equipment['equiptime'] = self.calc_time(float(data['equiptime'].text), data['equiptime'].attrib['scale'])
+        equipment['spellfailing'] = data['spellfailing'].text
+        equipment['armordeficit'] = data['armordeficit'].text
+        equipment['maxdexbonus'] = data['maxdexbonus'].text
+        equipment['armor'] = data['armor'].text
+        equipment['equiptime'] = str(self.calc_time(float(data['equiptime'].text), data['equiptime'].attrib['scale']))
         equipment['upgradepath'] = {}
         for upgradetree in data['upgradepath']:
             tree = {}
@@ -156,36 +156,12 @@ class Data():
         return val * {"t": 1,
                       "m": 4}.get(scale, 1)
 
-    # Data-Getters -------------------------------------------------------
-    # Getter für races-dict
-    def get_races(self):
-        return self.races
-
-    # Getter für talents-dict
-    def get_talents(self):
-        return self.talents
-
-    # Getter für items-dict
-    def get_items(self):
-        return self.items
-
-    # Getter für weapons-dict
-    def get_weapons(self):
-        return self.weapons
-
-    # Getter für equipments-dict
-    def get_equipments(self):
-        return self.equipments
-
     # Getter für einzelne Items als Objekte aus --------------------------
-    def get_item(self, id):
-        return Item(id, self.items[id])
+    def item(self, id): return Item(id, self.items[id])
 
-    def get_weapon(self, id):
-        return Weapon(id, self.items[id], self.weapons[id])
+    def weapon(self, id): return Weapon(id, self.items[id], self.weapons[id])
 
-    def get_equipment(self, id):
-        return Equipment(id, self.items[id], self.equipments[id])
+    def equipment(self, id): return Equipment(id, self.items[id], self.equipments[id])
 
     # Debugging ----------------------------------------------------------
     # Druckt alle Items aus
@@ -222,40 +198,52 @@ class Data():
 #####################################################################
 class Item():
     def __init__(self, id, item_data):
-        self.id = id
-        self.name = item_data['name']
-        self.weight = item_data['weight']
-        self.price = item_data['price']
-        self.special_text = item_data['special_text']
-        self.durability = item_data['durability']
+        self.data = item_data
+        self.data['id'] = id
 
-    def get_name(self):
-        return self.name
+    def sub_durability(self, val): self.data['durability'] -= val
 
-    def get_weight(self):
-        return self.weight
-
-    def get_price(self):
-        return self.price
-
-    def get_special_text(self):
-        return self.special_text
-
-    def get_durability(self):
-        return self.durability
-
-    def sub_durability(self, val):
-        self.durability -= val
-
-
-class Weapon(Item):
-    def __init__(self, id, item_data, weapon_data):
+class Equipable(Item):
+    def __init__(self, id, item_data, level=1, upgrade_path={}, equiptime="1"):
         super().__init__(id, item_data)
+        self.data['level'] = level
+        self.data['upgradepath'] = upgrade_path
+        self.data['equiptime'] = equiptime
 
-class Equipment(Item):
-    def __init__(self, id, item_data, equipment_data):
-        super().__init__(id, item_data)
+    def level_up(self, level=False):
+        if not level:
+            self.data['level'] += 1
+            level = self.data['level']
+        else:
+            self.data['level'] = level
+        for tree in self.data['upgradepath']:
+            if tree in self.data and str(level) in self.data['upgradepath'][tree]:
+                self.data[tree] = self.data[tree] + " (" + self.data['upgradepath'][tree][str(level)] + ")"
 
+    def reapply_levels(self, limit=False):
+        if not limit:
+            limit = self.data['level']
+        for level in range(1,limit+1):
+            self.level_up(level)
+
+class Weapon(Equipable):
+    def __init__(self, id, item_data, weapon_data, size='medium', level=1):
+        super().__init__(id, item_data, level, upgrade_path=weapon_data['upgradepath'], equiptime=weapon_data['equiptime'])
+        self.data['size'] = size
+        self.data['weapon_type'] = weapon_data['type']
+        self.data['base_damage'] = weapon_data['damage']
+        self.data['damage'] = weapon_data['damage'][size]
+        self.data['range'] = weapon_data['range']
+        self.reapply_levels(level)
+
+class Equipment(Equipable):
+    def __init__(self, id, item_data, equipment_data, level=1):
+        super().__init__(id, item_data, level, upgrade_path=equipment_data['upgradepath'], equiptime=equipment_data['equiptime'])
+        self.data['spellfailing'] = equipment_data['spellfailing']
+        self.data['armordeficit'] = equipment_data['armordeficit']
+        self.data['maxdexbonus'] = equipment_data['maxdexbonus']
+        self.data['armor'] = equipment_data['armor']
+        self.reapply_levels(level)
 
 ######################################################################
 class Player():
@@ -292,10 +280,18 @@ class Player():
 ######################################################################
 player = Player("test.xml")
 data = Data()
-talents = data.get_talents()
-races = data.get_races()
-items = data.get_items()
 
-data.print_items()
-data.print_weapons()
-data.print_equipments()
+irondagger = data.weapon(4)
+irondagger.reapply_levels(5)
+print(str(irondagger.data['level']) + " lvl | " +  irondagger.data['name'] + "\n" +
+      irondagger.data['special_text'] + "\n" +
+      irondagger.data['damage'])
+
+leathershoulders = data.equipment(5)
+print(str(leathershoulders.data['level']) + " lvl | " +  leathershoulders.data['name'] + "\n" +
+      leathershoulders.data['special_text'] + "\n" +
+      leathershoulders.data['armor'])
+leathershoulders.reapply_levels(2)
+print(str(leathershoulders.data['level']) + " lvl | " +  leathershoulders.data['name'] + "\n" +
+      leathershoulders.data['special_text'] + "\n" +
+      leathershoulders.data['armor'])
