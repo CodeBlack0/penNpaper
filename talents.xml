@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <talents>
-  <talent name="Dunkel Sicht">Verleit Sicht im Dunklen</talent>
-  <talent name="Defensive Training">Training im defensiven Kampfstil</talent>
-  <talent name="Stupid">Meiser der Lufthirn Technik</talent>
-  <talent name="Hyper Intellegent">Meister der heißen Lufthirn Technik</talent>
+  <talent id="1" name="Dunkel Sicht">Verleit Sicht im Dunklen</talent>
+  <talent id="2" name="Defensive Training">Training im defensiven Kampfstil</talent>
+  <talent id="3" name="Stupid">Meiser der Lufthirn Technik</talent>
+  <talent id="4" name="Hyper Intellegent">Meister der heißen Lufthirn Technik</talent>
 </talents>

@@ -4,21 +4,21 @@ from enum import Enum
 ######################################################################
 class Data():
   
-  def __init__(self, paths={races:"races.xml", talents:"talents.xml"}):
+  def __init__(self, paths={"races":"races.xml", "talents":"talents.xml"}):
      self.parse_talents(self.parse_file(paths['talents']))
      self.parse_races(self.parse_file(paths['races']))
 
   def parse_file(self, path):
-    return self.reparse_nodes(ET.parse(path).getroot())
+    return ET.parse(path).getroot()
 
   def parse_talents(self, raw_data):
     self.talents = {}
-    for talent in raw_data['talents']:
+    for talent in raw_data:
       self.talents[talent.attrib['name']] = talent.text
 
   def parse_races(self, raw_data):
     self.races = {}
-    for race in raw_data['races']:
+    for race in raw_data:
        self.races[race.attrib['name']] = self.parse_race(race)
 
   def parse_race(self, raw_data):
@@ -29,7 +29,7 @@ class Data():
     race['talents'] = []
     for talent in data['talents']:
       if talent.text in self.talents:
-        race['talents'].append(self.talents.index(talent.text))
+        race['talents'].append(talent.text)
 
     # return finished parse result
     return race
@@ -128,4 +128,4 @@ races = data.get_races()
 
 player = Player("test.xml")
 for talent in races[player.get_data()['stats']['race']]['talents']:
-  print(talents[talent])
+  print(talent)
