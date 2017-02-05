@@ -6,5 +6,15 @@
         <crit type="1d2" mul="2"></crit>
         <range scale="m">1</range>
         <equiptime scale="t">1</equiptime>
+        <upgradepath>
+            <damage>
+                <upgrade level="1">1</upgrade>
+                <upgrade level="2">5</upgrade>
+                <upgrade level="3">10</upgrade>
+            </damage>
+            <range>
+                <upgrade level="5">2</upgrade>
+            </range>
+        </upgradepath>
     </weapon>
 </weapons>

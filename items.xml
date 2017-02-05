@@ -28,4 +28,11 @@
         <special_text>Small iron dagger.</special_text>
         <durability>1000</durability>
     </item>
+    <item id="5">
+        <name>Leather Shoulder Pads</name>
+        <weight scale="g">500</weight>
+        <price scale="g">5</price>
+        <special_text>Lightweight leather shoulderpads.</special_text>
+        <durability>5000</durability>
+    </item>
 </items>
