@@ -177,6 +177,16 @@ class Data():
     def get_equipments(self):
         return self.equipments
 
+    # Getter für einzelne Items als Objekte aus --------------------------
+    def get_item(self, id):
+        return Item(id, self.items[id])
+
+    def get_weapon(self, id):
+        return Weapon(id, self.items[id], self.weapons[id])
+
+    def get_equipment(self, id):
+        return Equipment(id, self.items[id], self.equipments[id])
+
     # Debugging ----------------------------------------------------------
     # Druckt alle Items aus
     def print_items(self):
@@ -239,8 +249,12 @@ class Item():
 
 
 class Weapon(Item):
-    def __init__(self, weapon_data):
-        super().__init__(weapon_data)
+    def __init__(self, id, item_data, weapon_data):
+        super().__init__(id, item_data)
+
+class Equipment(Item):
+    def __init__(self, id, item_data, equipment_data):
+        super().__init__(id, item_data)
 
 
 ######################################################################
