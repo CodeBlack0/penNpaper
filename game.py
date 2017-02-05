@@ -4,9 +4,10 @@ from enum import Enum
 ######################################################################
 class Data():
   
-  def __init__(self, paths={"races":"races.xml", "talents":"talents.xml"}):
-     self.parse_talents(self.parse_file(paths['talents']))
-     self.parse_races(self.parse_file(paths['races']))
+  def __init__(self, paths={"races":"races.xml", "talents":"talents.xml", "items":"items.xml"}):
+    self.parse_talents(self.parse_file(paths['talents']))
+    self.parse_races(self.parse_file(paths['races']))
+    self.parse_items(self.parse_file(paths['items']))
 
   def parse_file(self, path):
     return ET.parse(path).getroot()
@@ -34,11 +35,38 @@ class Data():
     # return finished parse result
     return race
 
+  def parse_items(self, raw_data):
+    self.items = {}
+    for item in raw_data:
+      self.items[int(item.attrib['id'])] = self.parse_item(item)
+
+  def parse_item(self, raw_data):
+    # Preparing data for easier use
+    data = self.reparse_nodes(raw_data)
+    item = {}
+    item["name"] = data["name"].text
+    item["special_text"] = data["special_text"].text
+    item["price"] = self.calc_price(float(data["price"].text), data["price"].attrib["scale"])
+    item["weight"] = self.calc_weight(float(data["weight"].text), data["weight"].attrib["scale"])
+    item["durability"] = int(data["durability"].text)
+    return item
+
   def reparse_nodes(self, root):
     raw_data = {}
     for i, child in enumerate(root):
       raw_data[child.tag] = root[i]
     return raw_data
+
+  def calc_price(self, val, scale):
+    return val * { "g":10000,
+                   "s":100,
+                   "k":1}.get(scale, 1)
+
+  def calc_weight(self, val, scale):
+    return val * { "t":1000000,
+                   "k":1000,
+                   "g":1,
+                   "m":0.01}.get(scale, 1)
 
   def get_races(self):
     return self.races
@@ -46,6 +74,23 @@ class Data():
   def get_talents(self):
     return self.talents
 
+  def get_items(self):
+    return self.items
+
+  def print_items(self):
+    print("[ITEMS]")
+    for i, id in enumerate(self.items):
+      print("<ID: " + str(i) + "> --> Data: " + str(self.items[id]))
+
+  def print_races(self):
+    print("[RACES]")
+    for name, data in self.races.items():
+        print("<name: " + name + "> --> Data: " + str(data))
+
+  def print_talents(self):
+    print("[TALENTS]")
+    for name, data in self.talents.items():
+        print("<name: " + name + "> --> Data: " + str(data))
 #####################################################################
 class Item():
 
@@ -86,9 +131,6 @@ class Weapon(Item):
     for i, child in raw_data[1]:
       data[child.tag] = raw_data[1][i]
 
-
-
-
 ######################################################################
 class Player():
   
@@ -122,10 +164,12 @@ class Player():
     return self.data
 
 ######################################################################
+player = Player("test.xml")
 data = Data()
 talents = data.get_talents()
 races = data.get_races()
+items = data.get_items()
 
-player = Player("test.xml")
-for talent in races[player.get_data()['stats']['race']]['talents']:
-  print(talent)
+data.print_items()
+data.print_races()
+data.print_talents()
