@@ -46,21 +46,7 @@ class Data():
   def get_talents(self):
     return self.talents
 
-######################################################################
-class Race():
-
-  def __init__(self, raw_data, talents):
-    data = {}
-    for i, child in raw_data:
-      data[child.tag] = raw_data[i]
-
-    self.talents = []
-    for talent in data['talents']:
-        if talent.text in talents:
-
-
-
-######################################################################
+#####################################################################
 class Item():
 
   def __init__(self, raw_data):
@@ -143,27 +129,3 @@ races = data.get_races()
 player = Player("test.xml")
 for talent in races[player.get_data()['stats']['race']]['talents']:
   print(talents[talent])
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
