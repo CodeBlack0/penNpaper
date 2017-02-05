@@ -1,23 +1,23 @@
 <?xml version="1.0"?>
 <data>
   <races>
-    <human>
+    <race name="Human">
       <talents>
         <talent>Dunkel Sicht</talent>
         <talent>Stupid</talent>
         <talent>Defensive Training</talent>
       </talents>
-    </human>
-    <ork>
+    </race>
+    <race name="Ork">
       <talents>
         <talent>Hyper Intellegent</talent>
       </talents>
-    </ork>
+    </race>
   </races>
   <talents>
-    <talent>Dunkel Sicht</talent>
-    <talent>Defensive Training</talent>
-    <talent>Stupid</talent>
-    <talent>Hyper Intellegent</talent>
+    <talent name="Dunkel Sicht">Verleit Sicht im Dunklen</talent>
+    <talent name="Defensive Training">Training im defensiven Kampfstil</talent>
+    <talent name="Stupid">Meiser der Lufthirn Technik</talent>
+    <talent name="Hyper Intellegent">Meister der heißen Lufthirn Technik</talent>
   </talents>
 </data>
