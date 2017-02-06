@@ -124,7 +124,6 @@ class Data():
             equipment['upgradepath'][upgradetree.tag] = tree
         return equipment
 
-
     # Parsed alle nodes im XML-Objekt in ein Dictionary
     def reparse_nodes(self, root):
         raw_data = {}
@@ -159,14 +158,17 @@ class Data():
                       "m": 4}.get(scale, 1)
 
     # Getter für einzelne Items als Objekte aus --------------------------
-    def item(self, id): return Item(id, self.items['itemdata'][id])
+    def item(self, id):
+        return Item(id, self.items['itemdata'][id])
 
-    def weapon(self, id): return Weapon(id, self.items['itemdata'][id], self.items['weapondata'][id])
+    def weapon(self, id):
+        return Weapon(id, self.items['itemdata'][id], self.items['weapondata'][id])
 
-    def equipment(self, id): return Equipment(id, self.items['itemdata'][id], self.items['equipmentdata'][id])
+    def equipment(self, id):
+        return Equipment(id, self.items['itemdata'][id], self.items['equipmentdata'][id])
 
     # Debugging ----------------------------------------------------------
-    #Druckt ein Dictionary aus
+    # Druckt ein Dictionary aus
     def print_dict(self, item):
         for k, data in item.items():
             print(str(k) + ': ' + str(data))
@@ -212,6 +214,7 @@ class Data():
         for key, item in Item.instances.items():
             print(str(key) + " --> " + item.data['name'])
 
+
 #####################################################################
 # Classe für alle Items
 class Item():
@@ -236,6 +239,7 @@ class Item():
             "\n Price: " + self.data['price'] +
             "\n Specialtext: " + self.data['special_text'])
 
+
 # Parentclasse für alle ausrüstbaren Items
 class Equipable(Item):
     def __init__(self, id, item_data, level=1, upgrade_path={}, equiptime="1"):
@@ -257,13 +261,15 @@ class Equipable(Item):
 
     # Wendet eine gegebene Anzahl an Levels an
     def apply_levels(self, limit=1):
-        for level in range(self.data['level'], self.data['level']+limit):
+        for level in range(self.data['level'], self.data['level'] + limit):
             if level != 1: self.level_up(level)
+
 
 # Classe für alle Waffen
 class Weapon(Equipable):
     def __init__(self, id, item_data, weapon_data, size='medium', level=0):
-        super().__init__(id, item_data, level, upgrade_path=weapon_data['upgradepath'], equiptime=weapon_data['equiptime'])
+        super().__init__(id, item_data, level, upgrade_path=weapon_data['upgradepath'],
+                         equiptime=weapon_data['equiptime'])
         self.data['size'] = size
         self.data['weapon_type'] = weapon_data['type']
         self.data['base_damage'] = weapon_data['damage']
@@ -275,23 +281,26 @@ class Weapon(Equipable):
     # Druckt alle Infos zur Waffe aus
     def print_data(self):
         print("Item->Equipable->Weapon | uuid: <" + str(self.uuid) + "> | itemid: <" + str(self.data['id']) + ">")
-        print(str(self.data['level']) + " lvl | " + self.data['name'] + " | durability: " + str(self.data['durability']) +
-              "\n Weight: " + self.data['weight'] +
-              "\n Price: " + self.data['price'] +
-              "\n Specialtext: " + self.data['special_text'] +
-              "\n Damage: " + self.data['damage'] +
-              "\n Size: " + self.data['size'] +
-              "\n Weapontype: " + str(self.data['weapon_type']) +
-              "\n Damagetype: " + self.data['damage_type'] +
-              "\n Range: " + self.data['range'] +
-              "\n Upgradepaths: ")
+        print(
+            str(self.data['level']) + " lvl | " + self.data['name'] + " | durability: " + str(self.data['durability']) +
+            "\n Weight: " + self.data['weight'] +
+            "\n Price: " + self.data['price'] +
+            "\n Specialtext: " + self.data['special_text'] +
+            "\n Damage: " + self.data['damage'] +
+            "\n Size: " + self.data['size'] +
+            "\n Weapontype: " + str(self.data['weapon_type']) +
+            "\n Damagetype: " + self.data['damage_type'] +
+            "\n Range: " + self.data['range'] +
+            "\n Upgradepaths: ")
         for path in self.data['upgradepath']:
             print("   " + path + ": " + str(self.data['upgradepath'][path]))
+
 
 # Classe für alle Rüstungen etc.
 class Equipment(Equipable):
     def __init__(self, id, item_data, equipment_data, level=0):
-        super().__init__(id, item_data, level, upgrade_path=equipment_data['upgradepath'], equiptime=equipment_data['equiptime'])
+        super().__init__(id, item_data, level, upgrade_path=equipment_data['upgradepath'],
+                         equiptime=equipment_data['equiptime'])
         self.data['spellfailing'] = equipment_data['spellfailing']
         self.data['armordeficit'] = equipment_data['armordeficit']
         self.data['maxdexbonus'] = equipment_data['maxdexbonus']
@@ -301,17 +310,19 @@ class Equipment(Equipable):
     # Druckt alle Infos zur Rüstung o.ä. aus
     def print_data(self):
         print("Item->Equipable->Equipment | uuid: <" + str(self.uuid) + "> | itemid: <" + str(self.data['id']) + ">")
-        print(str(self.data['level']) + " lvl | " + self.data['name'] + " | durability: " + str(self.data['durability']) +
-              "\n Weight: " + self.data['weight'] +
-              "\n Price: " + self.data['price'] +
-              "\n Specialtext: " + self.data['special_text'] +
-              "\n Armor: " + self.data['armor'] +
-              "\n Spellfailing chance: " + self.data['spellfailing'] +
-              "\n Armordeficit: " + self.data['armordeficit'] +
-              "\n Maximum Dexterity Bonus: " + self.data['maxdexbonus'] +
-              "\n Upgradepaths: ")
+        print(
+            str(self.data['level']) + " lvl | " + self.data['name'] + " | durability: " + str(self.data['durability']) +
+            "\n Weight: " + self.data['weight'] +
+            "\n Price: " + self.data['price'] +
+            "\n Specialtext: " + self.data['special_text'] +
+            "\n Armor: " + self.data['armor'] +
+            "\n Spellfailing chance: " + self.data['spellfailing'] +
+            "\n Armordeficit: " + self.data['armordeficit'] +
+            "\n Maximum Dexterity Bonus: " + self.data['maxdexbonus'] +
+            "\n Upgradepaths: ")
         for path in self.data['upgradepath']:
             print("   " + path + ": " + str(self.data['upgradepath'][path]))
+
 
 ######################################################################
 # Classe zum verwalten von Spielerdaten
@@ -323,10 +334,11 @@ class Player():
         self.uuid = id(self)
         Player.instances[self.uuid] = self
 
-        self.inventory = {"contents": {1: None, 2: None, 3: None, 4: None, 5: None, 6: None, 7: None, 8: None, 9: None, 10: None},
-                          "weapons":  {1: None, 2: None, 3: None, 4: None, 5: None, 6: None},
-                          "equipment":{1: None, 2: None, 3: None, 4: None},
-                          "weight":0}
+        self.inventory = {
+            "contents": {1: None, 2: None, 3: None, 4: None, 5: None, 6: None, 7: None, 8: None, 9: None, 10: None},
+            "weapons": {1: None, 2: None, 3: None, 4: None, 5: None, 6: None},
+            "equipment": {1: None, 2: None, 3: None, 4: None},
+            "weight": 0}
         if isinstance(path, str):
             tree = ET.parse(path)
             root = tree.getroot()
@@ -382,13 +394,15 @@ class Player():
             return self.add_item_to_inventory(uuid, slot='weapons')
         if isinstance(Item.instances[uuid], Equipment):
             return self.add_item_to_inventory(uuid, slot='equipment')
-        else: return False
+        else:
+            return False
 
     # Rüstet einen Gegestand von Inventar aus (anhand des Indexes des Items in Inventar, gibt den 'Erfolg' zurück)
     def equip_from_inventory(self, index):
         if isinstance(Item.instances[self.inventory['contents'][index]], Equipable):
             return self.equip_item(self.remove_item_from_inventory(index))
-        else: return False
+        else:
+            return False
 
     # Druckt das Inventar eines Spieler aus
     def print_inventory(self, full=False):
@@ -414,6 +428,7 @@ class Player():
                 print(Item.instances[uuid].data['name'])
         else:
             print('--illegal uuid--')
+
 
 ######################################################################
 player = Player("test.xml")
