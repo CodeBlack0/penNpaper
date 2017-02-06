@@ -204,12 +204,20 @@ class Item():
     instances = {}
 
     def __init__(self, item_id, item_data):
-        self.data = item_data
-        self.data['id'] = item_id
         self.uuid = id(self)
         Item.instances[self.uuid] = self
+        self.data = item_data
+        self.data['id'] = item_id
 
     def sub_durability(self, val): self.data['durability'] -= val
+
+    def print_data(self):
+        print("Item | uuid: <" + str(self.uuid) + "> | itemid: <" + str(self.data['id']) + ">")
+        print(
+            str(self.data['level']) + " lvl | " + self.data['name'] + " | durability: " + str(self.data['durability']) +
+            "\n Weight: " + self.data['weight'] +
+            "\n Price: " + self.data['price'] +
+            "\n Specialtext: " + self.data['special_text'])
 
 class Equipable(Item):
     def __init__(self, id, item_data, level=1, upgrade_path={}, equiptime="1"):
@@ -286,10 +294,16 @@ class Equipment(Equipable):
 
 ######################################################################
 class Player():
+    instances = {}
+
     def __init__(self, path=False):
-        self.inventory = []
-        self.weapons = []
-        self.equipment = []
+        self.uuid = id(self)
+        Player.instances[self.uuid] = self
+
+        self.inventory = {"contents": {1: None, 2: None, 3: None, 4: None, 5: None, 6: None, 7: None, 8: None, 9: None, 10: None},
+                          "weapons":  {1: None, 2: None, 3: None, 4: None, 5: None, 6: None},
+                          "equipment":{1: None, 2: None, 3: None, 4: None},
+                          "weight":0}
         if isinstance(path, str):
             tree = ET.parse(path)
             root = tree.getroot()
@@ -315,28 +329,56 @@ class Player():
         for k in self.data:
             print(k + ": " + str(self.data[k]))
 
-    def add_item_to_inventory(self, item):
+    def add_item_to_inventory(self, item, slot='contents'):
         if isinstance(item, Item):
-            self.inventory.append(item)
+            uuid = item.uuid
+        elif item in Item.instances:
+            uuid = item
+        else:
+            return False
+        for k, v in self.inventory[slot].items():
+            if v == None:
+                self.inventory[slot][k] = uuid
+                return k
+        return False
 
-    def equip_item(self, item):
-        if isinstance(item, Weapon) and len(self.weapons) <= 6:
-            self.weapons.append(item)
-            return True
-        if isinstance(item, Equipment) and len(self.equipment) <= 4:
-            self.equipment.append(item)
-            return True
+    def remove_item_from_inventory(self, index):
+        if not index in self.inventory['contents']: return False
+        temp, self.inventory['contents'][index] = self.inventory['contents'][index], None
+        return temp
+
+    def equip_item(self, uuid):
+        if isinstance(Item.instances[uuid], Weapon):
+            return self.add_item_to_inventory(uuid, slot='weapons')
+        if isinstance(Item.instances[uuid], Equipment):
+            return self.add_item_to_inventory(uuid, slot='equipment')
         else: return False
 
-    def equip_from_inventory_by_index(self, index):
-        return self.equip_item(self.inventory.pop(index))
+    def equip_from_inventory(self, index):
+        return self.equip_item(self.remove_item_from_inventory(index))
 
-    def equip_from_inventory_by_uuid(self, uuid):
-        for index, item in enumerate(self.inventory):
-            if uuid == item.uuid:
-                return self.equip_item(self.inventory.pop(index))
-                break
-        return False
+    def print_inventory(self, full=False):
+        print('----[Player Inventory][Player UUID: ' + str(self.uuid) + ']---- \n<-- [Bag] -->')
+        for k, uuid in self.inventory['contents'].items():
+            self.print_inventory_slot(k, uuid, full)
+        print('<-- [Weapons] -->')
+        for k, uuid in self.inventory['weapons'].items():
+            self.print_inventory_slot(k, uuid, full)
+        print('<-- [Equipment] -->')
+        for k, uuid in self.inventory['equipment'].items():
+            self.print_inventory_slot(k, uuid, full)
+
+    def print_inventory_slot(self, k, uuid, full=True):
+        print('[Slot ' + str(k) + '] | ', end='')
+        if uuid == None:
+            print('--empty--')
+        elif uuid in Item.instances:
+            if full:
+                Item.instances[uuid].print_data()
+            else:
+                print(Item.instances[uuid].data['name'])
+        else:
+            print('--illegal uuid--')
 
 ######################################################################
 player = Player("test.xml")
@@ -344,15 +386,13 @@ data = Data()
 
 irondagger = data.weapon(4)
 irondagger.apply_levels(5)
-irondagger.print_data()
-print("----------------------------------------")
 leathershoulders = data.equipment(5)
-leathershoulders.print_data()
-print("----------------------------------------")
-leathershoulders.apply_levels(2)
-leathershoulders.print_data()
-print("----------------------------------------")
 leathershoulders.level_up("GODHOOD")
-leathershoulders.print_data()
-print("----------------------------------------")
-print(Item.instances)
+
+player.print_inventory()
+player.add_item_to_inventory(irondagger)
+player.add_item_to_inventory(leathershoulders)
+player.print_inventory()
+player.equip_from_inventory(1)
+player.equip_from_inventory(2)
+player.print_inventory()
