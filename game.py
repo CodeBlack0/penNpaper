@@ -9,6 +9,7 @@ class Data():
                               "items": "items.xml",
                               "weapons": "weapons.xml",
                               "equipments": "equipments.xml"}):
+        self.items = {}
         self.parse_talents(self.parse_file(paths['talents']))
         self.parse_races(self.parse_file(paths['races']))
         self.parse_items(self.parse_file(paths['items']))
@@ -48,9 +49,9 @@ class Data():
 
     # Parsing data on items ---------------
     def parse_items(self, raw_data):
-        self.items = {}
+        self.items['itemdata'] = {}
         for item in raw_data:
-            self.items[int(item.attrib['id'])] = self.parse_item(item)
+            self.items['itemdata'][int(item.attrib['id'])] = self.parse_item(item)
 
     # Parsing data for a single item ------
     def parse_item(self, raw_data):
@@ -67,11 +68,11 @@ class Data():
 
     # Parsing data on weapons -------------
     def parse_weapons(self, raw_data):
-        self.weapons = {}
+        self.items['weapondata'] = {}
         for weapon in raw_data:
             proposed_id_ref = int(weapon.attrib['item_id'])
-            if proposed_id_ref in self.items:
-                self.weapons[proposed_id_ref] = self.parse_weapon(weapon)
+            if proposed_id_ref in self.items['itemdata']:
+                self.items['weapondata'][proposed_id_ref] = self.parse_weapon(weapon)
 
     # Parsing data for a single weapon ----
     def parse_weapon(self, raw_data):
@@ -98,11 +99,11 @@ class Data():
 
     # Parse data on equipments ------------
     def parse_equipments(self, raw_data):
-        self.equipments = {}
+        self.items['equipmentdata'] = {}
         for equipment in raw_data:
             proposed_id_ref = int(equipment.attrib['item_id'])
-            if proposed_id_ref in self.items:
-                self.equipments[proposed_id_ref] = self.parse_equipment(equipment)
+            if proposed_id_ref in self.items['itemdata']:
+                self.items['equipmentdata'][proposed_id_ref] = self.parse_equipment(equipment)
 
     # Parse data for a single equipment -
     def parse_equipment(self, raw_data):
@@ -158,30 +159,42 @@ class Data():
                       "m": 4}.get(scale, 1)
 
     # Getter für einzelne Items als Objekte aus --------------------------
-    def item(self, id): return Item(id, self.items[id])
+    def item(self, id): return Item(id, self.items['itemdata'][id])
 
-    def weapon(self, id): return Weapon(id, self.items[id], self.weapons[id])
+    def weapon(self, id): return Weapon(id, self.items['itemdata'][id], self.items['weapondata'][id])
 
-    def equipment(self, id): return Equipment(id, self.items[id], self.equipments[id])
+    def equipment(self, id): return Equipment(id, self.items['itemdata'][id], self.items['equipmentdata'][id])
 
     # Debugging ----------------------------------------------------------
+    #Druckt ein Dictionary aus
+    def print_dict(self, item):
+        for k, data in item.items():
+            print(str(k) + ': ' + str(data))
+
     # Druckt alle Items aus
     def print_items(self):
         print("[ITEMS]")
-        for id, data in self.items.items():
-            print("<ID: " + str(id) + ">\n--> Data: " + str(data))
+        for id, data in self.items['itemdata'].items():
+            print("<ID: " + str(id) + ">")
+            self.print_dict(data)
 
     # Druckt alle Waffen aus
     def print_weapons(self):
         print("[WEAPONS]")
-        for id, data in self.weapons.items():
-            print("<ID: " + str(id) + ">\n--> Itemdata: " + str(self.items[id]) + "\n--> Weapondata: " + str(data))
+        for id, data in self.items['weapondata'].items():
+            print("<ID: " + str(id) + ">\n--> Itemdata: ")
+            self.print_dict(self.items['itemdata'][id])
+            print("--> Weapondata: ")
+            self.print_dict(data)
 
     # Druckt alle ausrüstbaren Gegstände aus
     def print_equipments(self):
         print("[EQUIPMENTS]")
-        for id, data in self.equipments.items():
-            print("<ID: " + str(id) + ">\n--> Itemdata: " + str(self.items[id]) + "\n--> Equipdata: " + str(data))
+        for id, data in self.items['equipmentdata'].items():
+            print("<ID: " + str(id) + ">\n--> Itemdata: ")
+            self.print_dict(self.items['itemdata'][id])
+            print("--> Equipmentdata: ")
+            self.print_dict(data)
 
     # Druckt alle Rassen aus
     def print_races(self):
@@ -200,7 +213,9 @@ class Data():
             print(str(key) + " --> " + item.data['name'])
 
 #####################################################################
+# Classe für alle Items
 class Item():
+    # Dict aller Item-Instancen
     instances = {}
 
     def __init__(self, item_id, item_data):
@@ -209,8 +224,10 @@ class Item():
         self.data = item_data
         self.data['id'] = item_id
 
+    # Zieht von der Haltbarkeit eines Items einen gegebene Wert ab
     def sub_durability(self, val): self.data['durability'] -= val
 
+    # Druckt alle Infos zum Item aus
     def print_data(self):
         print("Item | uuid: <" + str(self.uuid) + "> | itemid: <" + str(self.data['id']) + ">")
         print(
@@ -219,6 +236,7 @@ class Item():
             "\n Price: " + self.data['price'] +
             "\n Specialtext: " + self.data['special_text'])
 
+# Parentclasse für alle ausrüstbaren Items
 class Equipable(Item):
     def __init__(self, id, item_data, level=1, upgrade_path={}, equiptime="1"):
         super().__init__(id, item_data)
@@ -226,6 +244,7 @@ class Equipable(Item):
         self.data['upgradepath'] = upgrade_path
         self.data['equiptime'] = equiptime
 
+    # Wendet den vorgegebenen Level-Up Pfad eines ausrüstbaren Items an
     def level_up(self, level=False):
         if not level:
             self.data['level'] += 1
@@ -236,12 +255,12 @@ class Equipable(Item):
             if tree in self.data and str(level) in self.data['upgradepath'][tree]:
                 self.data[tree] = self.data[tree] + " (" + self.data['upgradepath'][tree][str(level)] + ")"
 
-    def apply_levels(self, limit=False):
-        if not limit:
-            limit = 1
+    # Wendet eine gegebene Anzahl an Levels an
+    def apply_levels(self, limit=1):
         for level in range(self.data['level'], self.data['level']+limit):
             if level != 1: self.level_up(level)
 
+# Classe für alle Waffen
 class Weapon(Equipable):
     def __init__(self, id, item_data, weapon_data, size='medium', level=0):
         super().__init__(id, item_data, level, upgrade_path=weapon_data['upgradepath'], equiptime=weapon_data['equiptime'])
@@ -253,6 +272,7 @@ class Weapon(Equipable):
         self.data['range'] = weapon_data['range']
         self.apply_levels(level)
 
+    # Druckt alle Infos zur Waffe aus
     def print_data(self):
         print("Item->Equipable->Weapon | uuid: <" + str(self.uuid) + "> | itemid: <" + str(self.data['id']) + ">")
         print(str(self.data['level']) + " lvl | " + self.data['name'] + " | durability: " + str(self.data['durability']) +
@@ -268,7 +288,7 @@ class Weapon(Equipable):
         for path in self.data['upgradepath']:
             print("   " + path + ": " + str(self.data['upgradepath'][path]))
 
-
+# Classe für alle Rüstungen etc.
 class Equipment(Equipable):
     def __init__(self, id, item_data, equipment_data, level=0):
         super().__init__(id, item_data, level, upgrade_path=equipment_data['upgradepath'], equiptime=equipment_data['equiptime'])
@@ -278,6 +298,7 @@ class Equipment(Equipable):
         self.data['armor'] = equipment_data['armor']
         self.apply_levels(1)
 
+    # Druckt alle Infos zur Rüstung o.ä. aus
     def print_data(self):
         print("Item->Equipable->Equipment | uuid: <" + str(self.uuid) + "> | itemid: <" + str(self.data['id']) + ">")
         print(str(self.data['level']) + " lvl | " + self.data['name'] + " | durability: " + str(self.data['durability']) +
@@ -293,7 +314,9 @@ class Equipment(Equipable):
             print("   " + path + ": " + str(self.data['upgradepath'][path]))
 
 ######################################################################
+# Classe zum verwalten von Spielerdaten
 class Player():
+    # Dict für alle Player-Instancen
     instances = {}
 
     def __init__(self, path=False):
@@ -325,10 +348,12 @@ class Player():
 
         self.data['stats'] = stats
 
+    # Druckt alle Spielerdaten aus
     def print_data_dict(self):
         for k in self.data:
             print(k + ": " + str(self.data[k]))
 
+    # Fügt ein Item dem Inventar hinzu (anhand der uuid, gibt den 'Erfolg' zurück)
     def add_item_to_inventory(self, item, slot='contents'):
         if isinstance(item, Item):
             uuid = item.uuid
@@ -342,21 +367,30 @@ class Player():
                 return k
         return False
 
+    # Entfernt ein Item aus dem Inventar (gibt das Item zurück)
     def remove_item_from_inventory(self, index):
         if not index in self.inventory['contents']: return False
         temp, self.inventory['contents'][index] = self.inventory['contents'][index], None
         return temp
 
+    # Rüstet einen Gegenstand aus (anhand der uuid, gibt den 'Erfolg' zurück
     def equip_item(self, uuid):
+        if uuid == None: return False
+        if (isinstance(uuid, Item)):
+            uuid = uuid.uuid
         if isinstance(Item.instances[uuid], Weapon):
             return self.add_item_to_inventory(uuid, slot='weapons')
         if isinstance(Item.instances[uuid], Equipment):
             return self.add_item_to_inventory(uuid, slot='equipment')
         else: return False
 
+    # Rüstet einen Gegestand von Inventar aus (anhand des Indexes des Items in Inventar, gibt den 'Erfolg' zurück)
     def equip_from_inventory(self, index):
-        return self.equip_item(self.remove_item_from_inventory(index))
+        if isinstance(Item.instances[self.inventory['contents'][index]], Equipable):
+            return self.equip_item(self.remove_item_from_inventory(index))
+        else: return False
 
+    # Druckt das Inventar eines Spieler aus
     def print_inventory(self, full=False):
         print('----[Player Inventory][Player UUID: ' + str(self.uuid) + ']---- \n<-- [Bag] -->')
         for k, uuid in self.inventory['contents'].items():
@@ -368,6 +402,7 @@ class Player():
         for k, uuid in self.inventory['equipment'].items():
             self.print_inventory_slot(k, uuid, full)
 
+    # Druckt ein einzelnes Item aus (anhand der uuid, kann zwischen vollständiger und gekürtzter darstellung unterscheiden)
     def print_inventory_slot(self, k, uuid, full=True):
         print('[Slot ' + str(k) + '] | ', end='')
         if uuid == None:
@@ -384,15 +419,11 @@ class Player():
 player = Player("test.xml")
 data = Data()
 
-irondagger = data.weapon(4)
-irondagger.apply_levels(5)
-leathershoulders = data.equipment(5)
-leathershoulders.level_up("GODHOOD")
-
-player.print_inventory()
-player.add_item_to_inventory(irondagger)
-player.add_item_to_inventory(leathershoulders)
-player.print_inventory()
-player.equip_from_inventory(1)
-player.equip_from_inventory(2)
+index1 = player.add_item_to_inventory(data.item(2))
+index2 = player.add_item_to_inventory(data.item(3))
+index3 = player.add_item_to_inventory(data.weapon(4))
+player.equip_from_inventory(index1)
+player.equip_from_inventory(index2)
+player.equip_from_inventory(index3)
+player.equip_item(data.equipment(5))
 player.print_inventory()
