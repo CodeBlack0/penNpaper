@@ -1,34 +1,34 @@
 <?xml version="1.0"?>
 <items>
-    <item id="1">
+    <item item_id="1">
         <name>Dildo of God</name>
         <weight scale="k">1</weight>
         <price scale="g">10</price>
         <special_text>LONG BLACK PLASTIC SHLONG</special_text>
         <durability>10</durability>
     </item>
-    <item id="2">
+    <item item_id="2">
         <name>Sherlocks Pipe</name>
         <weight scale="g">50</weight>
         <price scale="g">1</price>
         <special_text>Grants 'Hyper Analsyse' Trait whilset being smoked with. (uses 10 Tabacco per smoke)</special_text>
         <durability>0</durability>
     </item>
-    <item id="3">
+    <item item_id="3">
         <name>Pipe Tabacco</name>
         <weight scale="g">200</weight>
         <price scale="s">50</price>
         <special_text>Can be smoked in any fashion.</special_text>
         <durability>100</durability>
     </item>
-    <item id="4">
+    <item item_id="4">
         <name>Iron Dagger</name>
         <weight scale="k">1</weight>
         <price scale="g">2.5</price>
         <special_text>Small iron dagger.</special_text>
         <durability>1000</durability>
     </item>
-    <item id="5">
+    <item item_id="5">
         <name>Leather Shoulder Pads</name>
         <weight scale="g">500</weight>
         <price scale="g">5</price>

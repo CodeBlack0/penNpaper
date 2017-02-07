@@ -4,8 +4,10 @@ import xml.etree.ElementTree as ET
 ######################################################################
 class Data():
     def __init__(self, path="data_files.xml"):
-        self.items = {}
-        files = {}
+        self.items = dict()
+        self.talents = dict()
+        self.races = dict()
+        files = dict()
         for file in self.parse_file(path):
             files[file.attrib['name']] = file.text
         self.parse_talents(self.parse_file(files['talents']))
@@ -21,13 +23,11 @@ class Data():
 
     # Parsing data on talents -------------
     def parse_talents(self, raw_data):
-        self.talents = {}
         for talent in raw_data:
             self.talents[talent.attrib['name']] = talent.text
 
     # Parsing data on races ---------------
     def parse_races(self, raw_data):
-        self.races = {}
         for race in raw_data:
             self.races[race.attrib['name']] = self.parse_race(race)
 
@@ -35,7 +35,7 @@ class Data():
     def parse_race(self, raw_data):
         # Preparsing data for easier use
         data = self.reparse_nodes(raw_data)
-        race = {}
+        race = dict()
         # Parsing talents
         race['talents'] = []
         for talent in data['talents']:
@@ -47,15 +47,15 @@ class Data():
 
     # Parsing data on items ---------------
     def parse_items(self, raw_data):
-        self.items['itemdata'] = {}
+        self.items['itemdata'] = dict()
         for item in raw_data:
-            self.items['itemdata'][int(item.attrib['id'])] = self.parse_item(item)
+            self.items['itemdata'][int(item.attrib['item_id'])] = self.parse_item(item)
 
     # Parsing data for a single item ------
     def parse_item(self, raw_data):
         # Preparing data for easier use
         data = self.reparse_nodes(raw_data)
-        item = {}
+        item = dict()
         # Parsing Item data
         item['name'] = data['name'].text
         item['special_text'] = data['special_text'].text
@@ -66,7 +66,7 @@ class Data():
 
     # Parsing data on weapons -------------
     def parse_weapons(self, raw_data):
-        self.items['weapondata'] = {}
+        self.items['weapondata'] = dict()
         for weapon in raw_data:
             proposed_id_ref = int(weapon.attrib['item_id'])
             if proposed_id_ref in self.items['itemdata']:
@@ -76,7 +76,7 @@ class Data():
     def parse_weapon(self, raw_data):
         # Preparing data for easier use
         data = self.reparse_nodes(raw_data)
-        weapon = {}
+        weapon = dict()
         # Parsing Weapon data
         weapon['type'] = {'hands': data['type'].attrib['hands'],
                           'rangend': data['type'].attrib['ranged'] == "1"}
@@ -87,9 +87,9 @@ class Data():
                             'type': data['damage'].attrib['type']}
         weapon['range'] = str(self.calc_length(float(data['range'].text), data['range'].attrib['scale']))
         weapon['equiptime'] = str(self.calc_time(float(data['equiptime'].text), data['equiptime'].attrib['scale']))
-        weapon['upgradepath'] = {}
+        weapon['upgradepath'] = dict()
         for upgradetree in data['upgradepath']:
-            tree = {}
+            tree = dict()
             for upgrade in upgradetree:
                 tree[upgrade.attrib['level']] = upgrade.text
             weapon['upgradepath'][upgradetree.tag] = tree
@@ -97,7 +97,7 @@ class Data():
 
     # Parse data on equipments ------------
     def parse_equipments(self, raw_data):
-        self.items['equipmentdata'] = {}
+        self.items['equipmentdata'] = dict()
         for equipment in raw_data:
             proposed_id_ref = int(equipment.attrib['item_id'])
             if proposed_id_ref in self.items['itemdata']:
@@ -107,94 +107,100 @@ class Data():
     def parse_equipment(self, raw_data):
         # Preparing data for easier use
         data = self.reparse_nodes(raw_data)
-        equipment = {}
+        equipment = dict()
         # Parsing Equipment data
         equipment['spellfailing'] = data['spellfailing'].text
         equipment['armordeficit'] = data['armordeficit'].text
         equipment['maxdexbonus'] = data['maxdexbonus'].text
         equipment['armor'] = data['armor'].text
         equipment['equiptime'] = str(self.calc_time(float(data['equiptime'].text), data['equiptime'].attrib['scale']))
-        equipment['upgradepath'] = {}
+        equipment['upgradepath'] = dict()
         for upgradetree in data['upgradepath']:
-            tree = {}
+            tree = dict()
             for upgrade in upgradetree:
                 tree[upgrade.attrib['level']] = upgrade.text
             equipment['upgradepath'][upgradetree.tag] = tree
         return equipment
 
-    # Parsed alle nodes im XML-Objekt in ein Dictionary
-    def reparse_nodes(self, root):
-        raw_data = {}
+    # Parsed alle nodes im XML-Objekt in ein dict()ionary
+    def reparse_nodes(root):
+        raw_data = dict()
         for i, child in enumerate(root):
             raw_data[child.tag] = root[i]
         return raw_data
+    reparse_nodes = staticmethod(reparse_nodes)
 
     # Calculating Data ---------------------------------------------------
     # Berechnet Preise in einheitliche Werte
-    def calc_price(self, val, scale):
+    def calc_price(val, scale):
         return val * {"g": 10000,
                       "s": 100,
                       "c": 1}.get(scale, 1)
+    calc_price = staticmethod(calc_price)
 
     # Berechnet Gewichte in einheitliche Werte
-    def calc_weight(self, val, scale):
+    def calc_weight(val, scale):
         return val * {"t": 1000000,
                       "k": 1000,
                       "g": 1,
                       "m": 0.01}.get(scale, 1)
+    calc_weight = staticmethod(calc_weight)
 
     # Berechnet Längen in einheitliche Werte
-    def calc_length(self, val, scale):
+    def calc_length(val, scale):
         return val * {"k": 1000,
                       "m": 1,
                       "d": 0.1,
                       "c": 0.01}.get(scale, 1)
+    calc_length = staticmethod(calc_length)
 
     # Berechnet Zeiten in einheitliche Werte
-    def calc_time(self, val, scale):
+    def calc_time(val, scale):
         return val * {"t": 1,
                       "m": 4}.get(scale, 1)
+    calc_time = staticmethod(calc_time)
 
     # Getter für einzelne Items als Objekte aus --------------------------
-    def item(self, id):
-        return Item(id, self.items['itemdata'][id])
+    def item(self, item_id):
+        return Item(item_id, self.items['itemdata'][item_id])
 
-    def weapon(self, id):
-        return Weapon(id, self.items['itemdata'][id], self.items['weapondata'][id])
+    def weapon(self, item_id):
+        return Weapon(item_id, self.items['itemdata'][item_id], self.items['weapondata'][item_id])
 
-    def equipment(self, id):
-        return Equipment(id, self.items['itemdata'][id], self.items['equipmentdata'][id])
+    def equipment(self, item_id):
+        return Equipment(item_id, self.items['itemdata'][item_id], self.items['equipmentdata'][item_id])
 
     # Debugging ----------------------------------------------------------
-    # Druckt ein Dictionary aus
-    def print_dict(self, item):
+    # Druckt ein dict()ionary aus
+    def print_dict(item):
         for k, data in item.items():
             print(str(k) + ': ' + str(data))
+    print_dict = staticmethod(print_dict)
 
     # Druckt alle Items aus
     def print_items(self):
         print("[ITEMS]")
-        for id, data in self.items['itemdata'].items():
-            print("<ID: " + str(id) + ">")
-            self.print_dict(data)
+        for item_id, data in self.items['itemdata'].items():
+            print("<ID: " + str(item_id) + ">")
+            self.print_dict()(data)
 
     # Druckt alle Waffen aus
     def print_weapons(self):
         print("[WEAPONS]")
-        for id, data in self.items['weapondata'].items():
-            print("<ID: " + str(id) + ">\n--> Itemdata: ")
-            self.print_dict(self.items['itemdata'][id])
+        for item_id, data in self.items['weapondata'].items():
+            print("<ID: " + str(item_id) + ">\n--> Itemdata: ")
+            self.print_dict()(self.items['itemdata'][item_id])
             print("--> Weapondata: ")
-            self.print_dict(data)
+            self.print_dict()(data)
 
     # Druckt alle ausrüstbaren Gegstände aus
     def print_equipments(self):
         print("[EQUIPMENTS]")
-        for id, data in self.items['equipmentdata'].items():
-            print("<ID: " + str(id) + ">\n--> Itemdata: ")
-            self.print_dict(self.items['itemdata'][id])
+        for item_id, data in self.items['equipmentdata'].items():
+            print("<ID: " + str(item_id) + ">\n--> Itemdata: ")
+            self.print_dict()(self.items['itemdata'][item_id])
             print("--> Equipmentdata: ")
-            self.print_dict(data)
+            self.print_dict()(data)
 
     # Druckt alle Rassen aus
     def print_races(self):
@@ -216,21 +222,21 @@ class Data():
 #####################################################################
 # Classe für alle Items
 class Item():
-    # Dict aller Item-Instancen
-    instances = {}
+    # dict() aller Item-Instancen
+    instances = dict()
 
     def __init__(self, item_id, item_data):
         self.uuid = id(self)
         Item.instances[self.uuid] = self
         self.data = item_data
-        self.data['id'] = item_id
+        self.data['item_id'] = item_id
 
     # Zieht von der Haltbarkeit eines Items einen gegebene Wert ab
     def sub_durability(self, val): self.data['durability'] -= val
 
     # Druckt alle Infos zum Item aus
     def print_data(self):
-        print("Item | uuid: <" + str(self.uuid) + "> | itemid: <" + str(self.data['id']) + ">")
+        print("Item | uuid: <" + str(self.uuid) + "> | itemid: <" + str(self.data['item_id']) + ">")
         print(
             str(self.data['level']) + " lvl | " + self.data['name'] + " | durability: " + str(self.data['durability']) +
             "\n Weight: " + self.data['weight'] +
@@ -240,8 +246,8 @@ class Item():
 
 # Parentclasse für alle ausrüstbaren Items
 class Equipable(Item):
-    def __init__(self, id, item_data, level=1, upgrade_path={}, equiptime="1"):
-        super().__init__(id, item_data)
+    def __init__(self, item_id, item_data, level=1, upgrade_path=dict(), equiptime="1"):
+        super().__init__(item_id, item_data)
         self.data['level'] = level
         self.data['upgradepath'] = upgrade_path
         self.data['equiptime'] = equiptime
@@ -265,8 +271,8 @@ class Equipable(Item):
 
 # Classe für alle Waffen
 class Weapon(Equipable):
-    def __init__(self, id, item_data, weapon_data, size='medium', level=0):
-        super().__init__(id, item_data, level, upgrade_path=weapon_data['upgradepath'],
+    def __init__(self, item_id, item_data, weapon_data, size='medium', level=0):
+        super().__init__(item_id, item_data, level, upgrade_path=weapon_data['upgradepath'],
                          equiptime=weapon_data['equiptime'])
         self.data['size'] = size
         self.data['weapon_type'] = weapon_data['type']
@@ -278,7 +284,7 @@ class Weapon(Equipable):
 
     # Druckt alle Infos zur Waffe aus
     def print_data(self):
-        print("Item->Equipable->Weapon | uuid: <" + str(self.uuid) + "> | itemid: <" + str(self.data['id']) + ">")
+        print("Item->Equipable->Weapon | uuid: <" + str(self.uuid) + "> | itemid: <" + str(self.data['item_id']) + ">")
         print(
             str(self.data['level']) + " lvl | " + self.data['name'] + " | durability: " + str(self.data['durability']) +
             "\n Weight: " + self.data['weight'] +
@@ -296,8 +302,8 @@ class Weapon(Equipable):
 
 # Classe für alle Rüstungen etc.
 class Equipment(Equipable):
-    def __init__(self, id, item_data, equipment_data, level=0):
-        super().__init__(id, item_data, level, upgrade_path=equipment_data['upgradepath'],
+    def __init__(self, item_id, item_data, equipment_data, level=0):
+        super().__init__(item_id, item_data, level, upgrade_path=equipment_data['upgradepath'],
                          equiptime=equipment_data['equiptime'])
         self.data['spellfailing'] = equipment_data['spellfailing']
         self.data['armordeficit'] = equipment_data['armordeficit']
@@ -307,7 +313,7 @@ class Equipment(Equipable):
 
     # Druckt alle Infos zur Rüstung o.ä. aus
     def print_data(self):
-        print("Item->Equipable->Equipment | uuid: <" + str(self.uuid) + "> | itemid: <" + str(self.data['id']) + ">")
+        print("Item->Equipable->Equipment | uuid: <" + str(self.uuid) + "> | itemid: <" + str(self.data['item_id']) + ">")
         print(
             str(self.data['level']) + " lvl | " + self.data['name'] + " | durability: " + str(self.data['durability']) +
             "\n Weight: " + self.data['weight'] +
@@ -324,9 +330,9 @@ class Equipment(Equipable):
 
 ######################################################################
 # Classe zum verwalten von Spielerdaten
-class Player():
-    # Dict für alle Player-Instancen
-    instances = {}
+class Player(object):
+    # dict() für alle Player-Instancen
+    instances = dict()
 
     def __init__(self, path=False):
         self.uuid = id(self)
@@ -341,22 +347,25 @@ class Player():
             tree = ET.parse(path)
             root = tree.getroot()
 
-        raw_data = {}
-        for i, child in enumerate(root):
-            raw_data[child.tag] = root[i]
+            raw_data = dict()
+            for i, child in enumerate(root):
+                raw_data[child.tag] = root[i]
 
-        self.data = {}
-        stats = {}
-        for child in raw_data['stats'][0]:
-            stats[child.tag] = child.text
-        stats['rolled'] = {}
-        for child in raw_data['stats'][1][0]:
-            stats['rolled'][child.tag] = int(child.text)
-        stats['other'] = {}
-        for child in raw_data['stats'][1][1]:
-            stats['other'][child.tag] = int(child.text)
+            self.data = dict()
+            stats = dict()
+            for child in raw_data['stats'][0]:
+                stats[child.tag] = child.text
+            stats['rolled'] = dict()
+            for child in raw_data['stats'][1][0]:
+                stats['rolled'][child.tag] = int(child.text)
+            stats['other'] = dict()
+            for child in raw_data['stats'][1][1]:
+                stats['other'][child.tag] = int(child.text)
 
-        self.data['stats'] = stats
+            self.data['stats'] = stats
+
+        else:
+            print("Failed to initialize Player from " + path)
 
     # Druckt alle Spielerdaten aus
     def print_data_dict(self):
@@ -372,21 +381,22 @@ class Player():
         else:
             return False
         for k, v in self.inventory[slot].items():
-            if v == None:
+            if v is None:
                 self.inventory[slot][k] = uuid
                 return k
         return False
 
     # Entfernt ein Item aus dem Inventar (gibt das Item zurück)
     def remove_item_from_inventory(self, index):
-        if not index in self.inventory['contents']: return False
+        if index not in self.inventory['contents']: return False
         temp, self.inventory['contents'][index] = self.inventory['contents'][index], None
         return temp
 
     # Rüstet einen Gegenstand aus (anhand der uuid, gibt den 'Erfolg' zurück
     def equip_item(self, uuid):
-        if uuid == None: return False
-        if (isinstance(uuid, Item)):
+        if uuid is None:
+            return False
+        if isinstance(uuid, Item):
             uuid = uuid.uuid
         if isinstance(Item.instances[uuid], Weapon):
             return self.add_item_to_inventory(uuid, slot='weapons')
@@ -414,10 +424,11 @@ class Player():
         for k, uuid in self.inventory['equipment'].items():
             self.print_inventory_slot(k, uuid, full)
 
-    # Druckt ein einzelnes Item aus (anhand der uuid, kann zwischen vollständiger und gekürtzter darstellung unterscheiden)
-    def print_inventory_slot(self, k, uuid, full=True):
+    # Druckt ein einzelnes Item aus
+    # (anhand der uuid, kann zwischen vollständiger und gekürtzter darstellung unterscheiden)
+    def print_inventory_slot(k, uuid, full=True):
         print('[Slot ' + str(k) + '] | ', end='')
-        if uuid == None:
+        if uuid is None:
             print('--empty--')
         elif uuid in Item.instances:
             if full:
@@ -426,6 +437,7 @@ class Player():
                 print(Item.instances[uuid].data['name'])
         else:
             print('--illegal uuid--')
+    print_inventory_slot = staticmethod(print_inventory_slot)
 
 
 ######################################################################
