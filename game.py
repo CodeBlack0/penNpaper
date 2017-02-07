@@ -8,8 +8,8 @@ class Data():
         files = {}
         for file in self.parse_file(path):
             files[file.attrib['name']] = file.text
-        self.parse_races(self.parse_file(files['races']))
         self.parse_talents(self.parse_file(files['talents']))
+        self.parse_races(self.parse_file(files['races']))
         self.parse_items(self.parse_file(files['items']))
         self.parse_weapons(self.parse_file(files['weapons']))
         self.parse_equipments(self.parse_file(files['equipments']))
@@ -430,7 +430,7 @@ class Player():
 
 
 ######################################################################
-player = Player("test.xml")
+player = Player("data/players/test.xml")
 data = Data()
 
 index1 = player.add_item_to_inventory(data.item(2))
