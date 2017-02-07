@@ -3,17 +3,17 @@ import xml.etree.ElementTree as ET
 
 ######################################################################
 class Data():
-    def __init__(self, paths={"races": "races.xml",
-                              "talents": "talents.xml",
-                              "items": "items.xml",
-                              "weapons": "weapons.xml",
-                              "equipments": "equipments.xml"}):
+    def __init__(self, path="data_files.xml"):
         self.items = {}
-        self.parse_talents(self.parse_file(paths['talents']))
-        self.parse_races(self.parse_file(paths['races']))
-        self.parse_items(self.parse_file(paths['items']))
-        self.parse_weapons(self.parse_file(paths['weapons']))
-        self.parse_equipments(self.parse_file(paths['equipments']))
+        files = {}
+        for file in self.parse_file(path):
+            files[file.attrib['name']] = file.text
+        self.parse_races(self.parse_file(files['races']))
+        self.parse_talents(self.parse_file(files['talents']))
+        self.parse_items(self.parse_file(files['items']))
+        self.parse_weapons(self.parse_file(files['weapons']))
+        self.parse_equipments(self.parse_file(files['equipments']))
+
 
     # Parsing ------------------------------------------------------------
     # Parsing XML File --------------------
