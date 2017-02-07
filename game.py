@@ -14,7 +14,6 @@ class Data():
         self.parse_weapons(self.parse_file(files['weapons']))
         self.parse_equipments(self.parse_file(files['equipments']))
 
-
     # Parsing ------------------------------------------------------------
     # Parsing XML File --------------------
     def parse_file(self, path):
