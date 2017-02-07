@@ -18,8 +18,9 @@ class Data():
 
     # Parsing ------------------------------------------------------------
     # Parsing XML File --------------------
-    def parse_file(self, path):
+    def parse_file(path):
         return ET.parse(path).getroot()
+    parse_file = staticmethod(parse_file)
 
     # Parsing data on talents -------------
     def parse_talents(self, raw_data):
@@ -182,25 +183,25 @@ class Data():
         print("[ITEMS]")
         for item_id, data in self.items['itemdata'].items():
             print("<ID: " + str(item_id) + ">")
-            self.print_dict()(data)
+            self.print_dict(data)
 
     # Druckt alle Waffen aus
     def print_weapons(self):
         print("[WEAPONS]")
         for item_id, data in self.items['weapondata'].items():
             print("<ID: " + str(item_id) + ">\n--> Itemdata: ")
-            self.print_dict()(self.items['itemdata'][item_id])
+            self.print_dict(self.items['itemdata'][item_id])
             print("--> Weapondata: ")
-            self.print_dict()(data)
+            self.print_dict(data)
 
     # Druckt alle ausrüstbaren Gegstände aus
     def print_equipments(self):
         print("[EQUIPMENTS]")
         for item_id, data in self.items['equipmentdata'].items():
             print("<ID: " + str(item_id) + ">\n--> Itemdata: ")
-            self.print_dict()(self.items['itemdata'][item_id])
+            self.print_dict(self.items['itemdata'][item_id])
             print("--> Equipmentdata: ")
-            self.print_dict()(data)
+            self.print_dict(data)
 
     # Druckt alle Rassen aus
     def print_races(self):
@@ -214,9 +215,10 @@ class Data():
         for name, data in self.talents.items():
             print("<name: " + name + ">\n--> Data: " + str(data))
 
-    def print_intanciated_items(self):
+    def print_intanciated_items():
         for key, item in Item.instances.items():
             print(str(key) + " --> " + item.data['name'])
+    print_intanciated_items = staticmethod(print_intanciated_items)
 
 
 #####################################################################
@@ -246,10 +248,10 @@ class Item():
 
 # Parentclasse für alle ausrüstbaren Items
 class Equipable(Item):
-    def __init__(self, item_id, item_data, level=1, upgrade_path=dict(), equiptime="1"):
+    def __init__(self, item_id, item_data, level=1, upgrade_path=None, equiptime="1"):
         super().__init__(item_id, item_data)
         self.data['level'] = level
-        self.data['upgradepath'] = upgrade_path
+        self.data['upgradepath'] = upgrade_path if upgrade_path is not None else dict()
         self.data['equiptime'] = equiptime
 
     # Wendet den vorgegebenen Level-Up Pfad eines ausrüstbaren Items an
@@ -334,7 +336,7 @@ class Player(object):
     # dict() für alle Player-Instancen
     instances = dict()
 
-    def __init__(self, path=False):
+    def __init__(self, path=None):
         self.uuid = id(self)
         Player.instances[self.uuid] = self
 
@@ -365,7 +367,7 @@ class Player(object):
             self.data['stats'] = stats
 
         else:
-            print("Failed to initialize Player from " + path)
+            print("Failed to initialize Player from " + str(path))
 
     # Druckt alle Spielerdaten aus
     def print_data_dict(self):
