@@ -1,45 +1,73 @@
 <?xml version="1.0"?>
 <items>
-    <item item_id="1">
+    <item item_id="-1">
         <name>Dildo of God</name>
-        <weight scale="k">1</weight>
         <price scale="g">10</price>
+        <weight scale="k">1</weight>
         <special_text>LONG BLACK PLASTIC SHLONG</special_text>
         <durability>10</durability>
     </item>
+    <item item_id="1">
+        <name>Gauntlet</name>
+>       <price scale="g">2</price>
+        <weight scale="k">0,5</weight>
+        <special_text>stylish Gauntlet for fierce bar fights</special_text>
+        <durability>0</durability>
+    </item>
     <item item_id="2">
-        <name>Sherlocks Pipe</name>
-        <weight scale="g">50</weight>
-        <price scale="g">1</price>
-        <special_text>Grants 'Hyper Analsyse' Trait whilset being smoked with. (uses 10 Tabacco per smoke)</special_text>
+        <name>Dagger</name>
+        <price scale="g">2</price>
+        <weight scale="k">0,5</weight>
+        <special_text> - </special_text>
         <durability>0</durability>
     </item>
     <item item_id="3">
-        <name>Pipe Tabacco</name>
-        <weight scale="g">200</weight>
-        <price scale="s">50</price>
-        <special_text>Can be smoked in any fashion.</special_text>
-        <durability>100</durability>
+        <name>Gauntlet, spiked</name>
+        <price scale="g">5</price>
+        <weight scale="k">0,5</weight>
+        <special_text> - </special_text>
+        <durability>0</durability>
     </item>
     <item item_id="4">
-        <name>Iron Dagger</name>
-        <weight scale="k">1</weight>
-        <price scale="g">2.5</price>
-        <special_text>Small iron dagger.</special_text>
-        <durability>1000</durability>
+        <name>Mace, light</name>
+        <price scale="g">5</price>
+        <weight scale="k">2</weight>
+        <special_text> - </special_text>
+        <durability>0</durability>
     </item>
     <item item_id="5">
-        <name>Leather Shoulder Pads</name>
-        <weight scale="g">500</weight>
-        <price scale="g">5</price>
-        <special_text>Lightweight leather shoulderpads.</special_text>
-        <durability>5000</durability>
+        <name>Sickle</name>
+        <price scale="g">6</price>
+        <weight scale="k">1</weight>
+        <special_text> - </special_text>
+        <durability>0</durability>
     </item>
     <item item_id="6">
-        <name>Steel Dagger</name>
-        <weight scale="k">1</weight>
-        <price scale="g">2.5</price>
-        <special_text>Small steel dagger.</special_text>
-        <durability>1000</durability>
+        <name>Club</name>
+        <price scale="g">0</price>
+        <weight scale="k">1,5</weight>
+        <special_text> - </special_text>
+        <durability>0</durability>
+    </item>
+    <item item_id="7">
+        <name>Mace, heavy</name>
+        <price scale="g">12</price>
+        <weight scale="k">4</weight>
+        <special_text> - </special_text>
+        <durability>0</durability>
+    </item>
+    <item item_id="8">
+        <name>Morningstar</name>
+        <price scale="g">8</price>
+        <weight scale="k">3</weight>
+        <special_text> - </special_text>
+        <durability>0</durability>
+    </item>
+    <item item_id="9">
+        <name>Shortspear</name>
+        <price scale="g">1</price>
+        <weight scale="k">1,5</weight>
+        <special_text> - </special_text>
+        <durability>0</durability>
     </item>
 </items>
