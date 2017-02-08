@@ -56,52 +56,39 @@ class Player(object):
     def parse_bag(self, raw_data):
         for child in raw_data:
             if child.tag == "item":
-                self.add_item_to_inventory(self.parse_item(child))
+                self.parse_item(child)
             elif child.tag == "weapon":
-                self.add_item_to_inventory(self.parse_weapon(child))
+                self.parse_weapon(child)
             elif child.tag == "equipment":
-                self.add_item_to_inventory(self.parse_equipment(child))
+                self.parse_equipment(child)
 
     def parse_item(self, data):
-        item = self.parent.item(int(data.attrib['itemid']))
-        item.data['durability'] = data.attrib['durability']
-        if data.text != "none":
-            item.data['name'] = data.text
-        return item.uuid
+        item = self.parent.item(int(data.attrib['itemid']), save_data=data)
+        self.add_item_to_inventory(item)
 
     # parsing weapons ====================================================
     def parse_weapons(self, raw_data):
         for child in raw_data:
-            self.equip_item(self.parse_weapon(child))
+            self.parse_weapon(child, equip=True)
 
-    def parse_weapon(self, data):
-        weapon = self.parent.weapon(int(data.attrib['itemid']))
-        uuid = weapon.uuid
-        Item.instances[uuid].data['durability'] = data.attrib['durability']
-        if data.text != "none":
-            Item.instances[uuid].data['name'] = data.text
-        if Data.is_number(data.attrib['level']):
-            Item.instances[uuid].apply_levels(data.attrib['level'])
+    def parse_weapon(self, data, equip=False):
+        weapon = self.parent.weapon(int(data.attrib['itemid']), save_data=data)
+        if equip:
+            self.equip_item(weapon)
         else:
-            Item.instances[uuid].level_up(data.attrib['level'])
-        return uuid
+            self.add_item_to_inventory(weapon.uuid)
 
     # parsing equipments =================================================
     def parse_equipments(self, raw_data):
         for child in raw_data:
-            self.equip_item(self.parse_equipment(child))
+            self.parse_equipment(child, equip=True)
 
-    def parse_equipment(self, data):
-        equipment = self.parent.equipment(int(data.attrib['itemid']))
-        uuid = equipment.uuid
-        equipment.data['durability'] = data.attrib['durability']
-        if data.text != "none":
-            Item.instances[uuid].data['name'] = data.text
-        if Data.is_number(data.attrib['level']):
-            Item.instances[uuid].apply_levels(data.attrib['level'])
+    def parse_equipment(self, data, equip=False):
+        equipment = self.parent.equipment(int(data.attrib['itemid']), save_data=data)
+        if equip:
+            self.equip_item(equipment)
         else:
-            Item.instances[uuid].level_up(data.attrib['level'])
-        return uuid
+            self.add_item_to_inventory(equipment.uuid)
 
     # Inventory Managment ==============================================================================================
     # adds a given [items uuid/item uuid] to the inventory ===============

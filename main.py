@@ -7,5 +7,5 @@ from obj_item import Item
 game = Game()
 player = Player("data/players/test.xml")
 
-player.print_inventory()
+player.print_inventory(full=True)
 print(Item.instances)

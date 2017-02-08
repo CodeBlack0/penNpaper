@@ -158,14 +158,14 @@ class Game(object):
     calc_time = staticmethod(calc_time)
 
     # Getter für einzelne Items als Objekte aus ========================================================================
-    def item(self, item_id):
-        return Item(item_id, self.items['itemdata'][item_id])
+    def item(self, item_id, save_data=None):
+        return Item(item_id, self.items['itemdata'][item_id], save_data=save_data)
 
-    def weapon(self, item_id):
-        return Weapon(item_id, self.items['itemdata'][item_id], self.items['weapondata'][item_id])
+    def weapon(self, item_id, save_data=None):
+        return Weapon(item_id, self.items['itemdata'][item_id], self.items['weapondata'][item_id], save_data=save_data)
 
-    def equipment(self, item_id):
-        return Equipment(item_id, self.items['itemdata'][item_id], self.items['equipmentdata'][item_id])
+    def equipment(self, item_id, save_data=None):
+        return Equipment(item_id, self.items['itemdata'][item_id], self.items['equipmentdata'][item_id], save_data=save_data)
 
     # Debugging ========================================================================================================
     # prints all items

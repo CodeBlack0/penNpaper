@@ -8,13 +8,14 @@ class Item(object):
     instances = dict()
     next_id = 0
 
-    def __init__(self, item_id, item_data):
+    def __init__(self, item_id, item_data, save_data=None):
         self.uuid = Item.next_id
         Item.next_id += 1
         Item.instances[self.uuid] = self
-        self.data = dict()
         self.data = item_data
         self.data['item_id'] = item_id
+        if save_data is not None:
+            self.set_specific_save_data(save_data)
 
     # subtracts a given value val from the items durability
     def sub_durability(self, val): self.data['durability'] -= val
@@ -27,12 +28,17 @@ class Item(object):
               "\n Price: " + self.data['price'] +
               "\n Specialtext: " + self.data['special_text'])
 
+    # loads item data from player inventory save
+    def set_specific_save_data(self, savedata):
+        self.data['durability'] = savedata.attrib['durability']
+        self.data['name'] = savedata.text if savedata.text != "none" else self.data['name']
+
 
 # Parentclass for all upgradeable items ================================================================================
 class Upgradeable(Item):
-    def __init__(self, item_id, item_data, level=1, upgrade_path=None, equiptime="1"):
+    def __init__(self, item_id, item_data, level=1, upgrade_path=None, equiptime="1", save_data=None):
         self.data = dict()
-        super().__init__(item_id, item_data)
+        super().__init__(item_id, item_data, save_data=save_data)
         self.data['level'] = level
         self.data['upgradepath'] = upgrade_path if upgrade_path is not None else dict()
         self.data['equiptime'] = equiptime
@@ -55,13 +61,21 @@ class Upgradeable(Item):
         for i in range(self.data['level'], self.data['level'] + int(limit)):
             self.level_up()
 
+    # loads item data from player inventory save
+    def set_specific_save_data(self, savedata):
+        super().set_specific_save_data(savedata)
+        if Data.is_number(savedata.attrib['level']):
+            self.apply_levels(savedata.attrib['level'])
+        else:
+            self.level_up(savedata.attrib['level'])
+
 
 # Class for all weapons ================================================================================================
 class Weapon(Upgradeable):
-    def __init__(self, item_id, item_data, weapon_data, size='medium', level=0):
+    def __init__(self, item_id, item_data, weapon_data, size='medium', level=0, save_data=None):
         self.data = dict()
         super().__init__(item_id, item_data, level, upgrade_path=weapon_data['upgradepath'],
-                         equiptime=weapon_data['equiptime'])
+                         equiptime=weapon_data['equiptime'], save_data=save_data)
         self.data['size'] = size
         self.data['weapon_type'] = weapon_data['type']
         self.data['base_damage'] = weapon_data['damage']
@@ -90,10 +104,10 @@ class Weapon(Upgradeable):
 
 # Class for all equipments =============================================================================================
 class Equipment(Upgradeable):
-    def __init__(self, item_id, item_data, equipment_data, level=0):
+    def __init__(self, item_id, item_data, equipment_data, level=0, save_data=None):
         self.data = dict()
         super().__init__(item_id, item_data, level, upgrade_path=equipment_data['upgradepath'],
-                         equiptime=equipment_data['equiptime'])
+                         equiptime=equipment_data['equiptime'], save_data=save_data)
         self.data['spellfailing'] = equipment_data['spellfailing']
         self.data['armordeficit'] = equipment_data['armordeficit']
         self.data['maxdexbonus'] = equipment_data['maxdexbonus']
