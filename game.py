@@ -432,11 +432,11 @@ class Player(object):
     def parse_bag(self, raw_data):
         for child in raw_data:
             if child.tag == "item":
-                self.inventory['bag'][int(child.attrib['slot'])] = self.parse_item(child)
+                self.add_item_to_inventory(self.parse_item(child))
             elif child.tag == "weapon":
-                self.inventory['bag'][int(child.attrib['slot'])] = self.parse_weapon(child)
+                self.add_item_to_inventory(self.parse_weapon(child))
             elif child.tag == "equipment":
-                self.inventory['bag'][int(child.attrib['slot'])] = self.parse_equipment(child)
+                self.add_item_to_inventory(self.parse_equipment(child))
 
     def parse_item(self, data):
         item = self.parent.item(int(data.attrib['itemid']))
@@ -448,7 +448,7 @@ class Player(object):
     # parsing weapons ====================================================
     def parse_weapons(self, raw_data):
         for child in raw_data:
-            self.inventory['weapons'][int(child.attrib['slot'])] = self.parse_weapon(child)
+            self.equip_item(self.parse_weapon(child))
 
     def parse_weapon(self, data):
         weapon = self.parent.weapon(int(data.attrib['itemid']))
@@ -465,7 +465,7 @@ class Player(object):
     # parsing equipments =================================================
     def parse_equipments(self, raw_data):
         for child in raw_data:
-            self.inventory['equipments'][int(child.attrib['slot'])] = self.parse_equipment(child)
+            self.equip_item(self.parse_equipment(child))
 
     def parse_equipment(self, data):
         equipment = self.parent.equipment(int(data.attrib['itemid']))
