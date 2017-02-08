@@ -22,16 +22,16 @@
     </stats>
     <inventory>
         <bag>
-            <item slot="1" itemid="2" durability="0">Daddy's Pipe</item>
-            <item slot="2" itemid="3" durability="200">none</item>
-            <weapon slot="7" itemid="4" durability="100" level="1">test</weapon>
+            <item itemid="2" durability="0">Daddy's Pipe</item>
+            <item itemid="3" durability="200">none</item>
+            <weapon itemid="4" durability="100" level="1">test</weapon>
         </bag>
         <weapons>
-            <weapon slot="1" itemid="4" durability="1000" level="1">none</weapon>
-            <weapon slot="3" itemid="6" durability="500" level="GODHOOD">My Dick</weapon>
+            <weapon itemid="4" durability="1000" level="1">none</weapon>
+            <weapon itemid="6" durability="500" level="GODHOOD">My Dick</weapon>
         </weapons>
         <equipments>
-            <equipment slot="1" itemid="5" durability="4500" level="2">Invisibility Cloak</equipment>
+            <equipment itemid="5" durability="4500" level="2">Invisibility Cloak</equipment>
         </equipments>
     </inventory>
 </data>
