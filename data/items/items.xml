@@ -29,7 +29,7 @@
         <durability>0</durability>
     </item>
     <item item_id="4">
-        <name>Mace. light</name>
+        <name>Light Mace</name>
         <price scale="g">5</price>
         <weight scale="k">2</weight>
         <special_text> - </special_text>
@@ -50,7 +50,7 @@
         <durability>0</durability>
     </item>
     <item item_id="7">
-        <name>Mace. heavy</name>
+        <name>Heavy Mace</name>
         <price scale="g">12</price>
         <weight scale="k">4</weight>
         <special_text> - </special_text>
