@@ -6,6 +6,7 @@ import os
 # Class for all static functions
 class Data(object):
     # Parsing XML File
+    @staticmethod
     def parse_file(path):
         try:
             if not isinstance(path, str):
@@ -16,9 +17,8 @@ class Data(object):
         except Exception as ex:
             print(ex)
 
-    parse_file = staticmethod(parse_file)
-
     # Parsed alle nodes im XML-Objekt in ein dictionary
+    @staticmethod
     def reparse_nodes(root):
         try:
             if not isinstance(root, ElemTree.Element):
@@ -31,21 +31,17 @@ class Data(object):
         except Exception as ex:
             print(ex)
 
-    reparse_nodes = staticmethod(reparse_nodes)
-
     # Prints a raw datadict
+    @staticmethod
     def print_dict(item):
         for k, data in item.items():
             print(str(k) + ': ' + str(data))
 
-    print_dict = staticmethod(print_dict)
-
     # checks if string is numeric
+    @staticmethod
     def is_number(s):
         try:
             float(s)
             return True
         except ValueError:
             return False
-
-    is_number = staticmethod(is_number)

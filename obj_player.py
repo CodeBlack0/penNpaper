@@ -93,15 +93,13 @@ class Player(object):
     # Inventory Managment ==============================================================================================
     # adds a given [items uuid/item uuid] to the inventory ===============
     def add_item_to_inventory(self, item, slot='bag'):
-        if isinstance(item, Item):
-            uuid = item.uuid
-        elif item in Item.instances:
-            uuid = item
-        else:
+        if item in Item.instances:
+            item = Item.instances[item]
+        elif not isinstance(item, Item):
             return False
         for k, v in self.inventory[slot].items():
             if v is None:
-                self.inventory[slot][k] = uuid
+                self.inventory[slot][k] = item
                 return k
         return False
 
@@ -127,7 +125,7 @@ class Player(object):
 
     # equips an item from the inventory based on a given index ===========
     def equip_from_inventory(self, index):
-        if isinstance(Item.instances[self.inventory['bag'][index]], Upgradeable):
+        if isinstance(self.inventory['bag'][index], Upgradeable):
             return self.equip_item(self.remove_item_from_inventory(index))
         else:
             return False
@@ -136,31 +134,30 @@ class Player(object):
     # Print player inventory =============================================
     def print_inventory(self, full=False):
         print('----[Player Inventory][Player UUID: ' + str(self.uuid) + ']---- \n<-- [Bag] -->')
-        for k, uuid in self.inventory['bag'].items():
-            self.print_inventory_slot(k, uuid, full)
+        for k, item in self.inventory['bag'].items():
+            self.print_inventory_slot(k, item, full)
         print('<-- [Weapons] -->')
-        for k, uuid in self.inventory['weapons'].items():
-            self.print_inventory_slot(k, uuid, full)
+        for k, weapon in self.inventory['weapons'].items():
+            self.print_inventory_slot(k, weapon, full)
         print('<-- [Equipment] -->')
-        for k, uuid in self.inventory['equipments'].items():
-            self.print_inventory_slot(k, uuid, full)
+        for k, equipment in self.inventory['equipments'].items():
+            self.print_inventory_slot(k, equipment, full)
 
     # prints a single slot with given values =============================
-    def print_inventory_slot(k, uuid, full=True):
+    @staticmethod
+    def print_inventory_slot(k, item, full=True):
         print('[Slot ' + str(k) + '] | ', end='')
-        if uuid is None:
+        if item is None:
             print('--empty--')
-        elif uuid in Item.instances:
+        elif isinstance(item, Item):
             if full:
                 print()
-                Item.instances[uuid].print_data()
+                item.print_data()
             else:
-                print(Item.instances[uuid].data['name'] + " [" + Item.instances[uuid].data['special_text'] + "]")
+                print(item.data['name'] + " [" + item.data['special_text'] + "]")
 
         else:
-            print('--illegal uuid--')
-
-    print_inventory_slot = staticmethod(print_inventory_slot)
+            print('--illegal item--')
 
     # prints player data =================================================
     def print_data_dict(self):

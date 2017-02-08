@@ -22,7 +22,7 @@
     </stats>
     <inventory>
         <bag>
-            <item itemid="-1" durability="1000">none</item>
+            <item itemid="-1" durability="1000">Dild of Doom</item>
             <item itemid="-1" durability="0">Dildo of Satan</item>
         </bag>
         <weapons>

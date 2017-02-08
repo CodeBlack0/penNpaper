@@ -30,8 +30,21 @@ class Item(object):
 
     # loads item data from player inventory save
     def set_specific_save_data(self, savedata):
+        Item.print_all_instances("Pre changes")
         self.data['durability'] = savedata.attrib['durability']
+        Item.print_all_instances("durability")
         self.data['name'] = savedata.text if savedata.text != "none" else self.data['name']
+        Item.print_all_instances("name")
+
+
+    @staticmethod
+    def print_all_instances(text):
+        print("=========" + text + "=========")
+        for uuid, item in Item.instances.items():
+            #print(item)
+            print(id(item.data))
+            #item.print_data()
+            #print("=======")
 
 
 # Parentclass for all upgradeable items ================================================================================
