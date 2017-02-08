@@ -1,5 +1,5 @@
 from obj_data import Data
-from obj_item import Item, Weapon, Equipment
+from obj_item import Item, Weapon, Equipment, Upgradeable
 from obj_game import Game
 
 
