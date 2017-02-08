@@ -1,7 +1,7 @@
 import xml.etree.ElementTree as ET
 
 
-######################################################################
+########################################################################################################################
 class Data():
     def __init__(self, path="data_files.xml"):
         self.items = dict()
@@ -16,18 +16,26 @@ class Data():
         self.parse_weapons(self.parse_file(files['weapons']))
         self.parse_equipments(self.parse_file(files['equipments']))
 
-    # Parsing ------------------------------------------------------------
-    # Parsing XML File --------------------
+    # Parsing ==========================================================================================================
+    # Parsing XML File
     def parse_file(path):
         return ET.parse(path).getroot()
     parse_file = staticmethod(parse_file)
 
-    # Parsing data on talents -------------
+    # Parsed alle nodes im XML-Objekt in ein dictionary
+    def reparse_nodes(root):
+        raw_data = dict()
+        for i, child in enumerate(root):
+            raw_data[child.tag] = root[i]
+        return raw_data
+    reparse_nodes = staticmethod(reparse_nodes)
+
+    # Parsing data on talents ===========================================
     def parse_talents(self, raw_data):
         for talent in raw_data:
             self.talents[talent.attrib['name']] = talent.text
 
-    # Parsing data on races ---------------
+    # Parsing data on races ==============================================
     def parse_races(self, raw_data):
         for race in raw_data:
             self.races[race.attrib['name']] = self.parse_race(race)
@@ -46,7 +54,7 @@ class Data():
         # return finished parse result
         return race
 
-    # Parsing data on items ---------------
+    # Parsing data on items ==============================================
     def parse_items(self, raw_data):
         self.items['itemdata'] = dict()
         for item in raw_data:
@@ -65,7 +73,7 @@ class Data():
         item['durability'] = int(data['durability'].text)
         return item
 
-    # Parsing data on weapons -------------
+    # Parsing data on weapons ============================================
     def parse_weapons(self, raw_data):
         self.items['weapondata'] = dict()
         for weapon in raw_data:
@@ -96,7 +104,7 @@ class Data():
             weapon['upgradepath'][upgradetree.tag] = tree
         return weapon
 
-    # Parse data on equipments ------------
+    # Parse data on equipments ===========================================
     def parse_equipments(self, raw_data):
         self.items['equipmentdata'] = dict()
         for equipment in raw_data:
@@ -123,15 +131,7 @@ class Data():
             equipment['upgradepath'][upgradetree.tag] = tree
         return equipment
 
-    # Parsed alle nodes im XML-Objekt in ein dict()ionary
-    def reparse_nodes(root):
-        raw_data = dict()
-        for i, child in enumerate(root):
-            raw_data[child.tag] = root[i]
-        return raw_data
-    reparse_nodes = staticmethod(reparse_nodes)
-
-    # Calculating Data ---------------------------------------------------
+    # Calculating Data =================================================================================================
     # Berechnet Preise in einheitliche Werte
     def calc_price(val, scale):
         return val * {"g": 10000,
@@ -161,7 +161,7 @@ class Data():
                       "m": 4}.get(scale, 1)
     calc_time = staticmethod(calc_time)
 
-    # Getter für einzelne Items als Objekte aus --------------------------
+    # Getter für einzelne Items als Objekte aus ========================================================================
     def item(self, item_id):
         return Item(item_id, self.items['itemdata'][item_id])
 
@@ -171,7 +171,7 @@ class Data():
     def equipment(self, item_id):
         return Equipment(item_id, self.items['itemdata'][item_id], self.items['equipmentdata'][item_id])
 
-    # Debugging ----------------------------------------------------------
+    # Debugging ========================================================================================================
     # Druckt ein dict()ionary aus
     def print_dict(item):
         for k, data in item.items():
@@ -221,8 +221,8 @@ class Data():
     print_intanciated_items = staticmethod(print_intanciated_items)
 
 
-#####################################################################
-# Classe für alle Items
+########################################################################################################################
+# Classe für alle Items ================================================================================================
 class Item():
     # dict() aller Item-Instancen
     instances = dict()
@@ -246,7 +246,7 @@ class Item():
             "\n Specialtext: " + self.data['special_text'])
 
 
-# Parentclasse für alle ausrüstbaren Items
+# Parentclasse für alle ausrüstbaren Items =============================================================================
 class Equipable(Item):
     def __init__(self, item_id, item_data, level=1, upgrade_path=None, equiptime="1"):
         super().__init__(item_id, item_data)
@@ -271,7 +271,7 @@ class Equipable(Item):
             if level != 1: self.level_up(level)
 
 
-# Classe für alle Waffen
+# Classe für alle Waffen ===============================================================================================
 class Weapon(Equipable):
     def __init__(self, item_id, item_data, weapon_data, size='medium', level=0):
         super().__init__(item_id, item_data, level, upgrade_path=weapon_data['upgradepath'],
@@ -302,7 +302,7 @@ class Weapon(Equipable):
             print("   " + path + ": " + str(self.data['upgradepath'][path]))
 
 
-# Classe für alle Rüstungen etc.
+# Classe für alle Rüstungen etc. =======================================================================================
 class Equipment(Equipable):
     def __init__(self, item_id, item_data, equipment_data, level=0):
         super().__init__(item_id, item_data, level, upgrade_path=equipment_data['upgradepath'],
@@ -315,7 +315,8 @@ class Equipment(Equipable):
 
     # Druckt alle Infos zur Rüstung o.ä. aus
     def print_data(self):
-        print("Item->Equipable->Equipment | uuid: <" + str(self.uuid) + "> | itemid: <" + str(self.data['item_id']) + ">")
+        print("Item->Equipable->Equipment | uuid: <" + str(self.uuid) +
+              "> | itemid: <" + str(self.data['item_id']) + ">")
         print(
             str(self.data['level']) + " lvl | " + self.data['name'] + " | durability: " + str(self.data['durability']) +
             "\n Weight: " + self.data['weight'] +
@@ -330,7 +331,7 @@ class Equipment(Equipable):
             print("   " + path + ": " + str(self.data['upgradepath'][path]))
 
 
-######################################################################
+########################################################################################################################
 # Classe zum verwalten von Spielerdaten
 class Player(object):
     # dict() für alle Player-Instancen
@@ -369,12 +370,12 @@ class Player(object):
         else:
             print("Failed to initialize Player from " + str(path))
 
-    # Druckt alle Spielerdaten aus
+    # Druckt alle Spielerdaten aus =====================================================================================
     def print_data_dict(self):
         for k in self.data:
             print(k + ": " + str(self.data[k]))
 
-    # Fügt ein Item dem Inventar hinzu (anhand der uuid, gibt den 'Erfolg' zurück)
+    # Fügt ein Item dem Inventar hinzu (anhand der uuid, gibt den 'Erfolg' zurück) =====================================
     def add_item_to_inventory(self, item, slot='contents'):
         if isinstance(item, Item):
             uuid = item.uuid
@@ -388,7 +389,7 @@ class Player(object):
                 return k
         return False
 
-    # Entfernt ein Item aus dem Inventar (gibt das Item zurück)
+    # Entfernt ein Item aus dem Inventar (gibt das Item zurück) ========================================================
     def remove_item_from_inventory(self, index):
         if index not in self.inventory['contents']: return False
         temp, self.inventory['contents'][index] = self.inventory['contents'][index], None
@@ -407,14 +408,14 @@ class Player(object):
         else:
             return False
 
-    # Rüstet einen Gegestand von Inventar aus (anhand des Indexes des Items in Inventar, gibt den 'Erfolg' zurück)
+    # Rüstet einen Gegestand von Inventar aus (anhand des Indexes des Items in Inventar, gibt den 'Erfolg' zurück) =====
     def equip_from_inventory(self, index):
         if isinstance(Item.instances[self.inventory['contents'][index]], Equipable):
             return self.equip_item(self.remove_item_from_inventory(index))
         else:
             return False
 
-    # Druckt das Inventar eines Spieler aus
+    # Druckt das Inventar eines Spieler aus ============================================================================
     def print_inventory(self, full=False):
         print('----[Player Inventory][Player UUID: ' + str(self.uuid) + ']---- \n<-- [Bag] -->')
         for k, uuid in self.inventory['contents'].items():
@@ -427,7 +428,7 @@ class Player(object):
             self.print_inventory_slot(k, uuid, full)
 
     # Druckt ein einzelnes Item aus
-    # (anhand der uuid, kann zwischen vollständiger und gekürtzter darstellung unterscheiden)
+    # (anhand der uuid, kann zwischen vollständiger und gekürtzter darstellung unterscheiden) ==========================
     def print_inventory_slot(k, uuid, full=True):
         print('[Slot ' + str(k) + '] | ', end='')
         if uuid is None:
