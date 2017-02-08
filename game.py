@@ -20,6 +20,7 @@ class Data():
     # Parsing XML File
     def parse_file(path):
         return ET.parse(path).getroot()
+
     parse_file = staticmethod(parse_file)
 
     # Parsed alle nodes im XML-Objekt in ein dictionary
@@ -28,6 +29,7 @@ class Data():
         for i, child in enumerate(root):
             raw_data[child.tag] = root[i]
         return raw_data
+
     reparse_nodes = staticmethod(reparse_nodes)
 
     # Parsing data on talents ===========================================
@@ -137,6 +139,7 @@ class Data():
         return val * {"g": 10000,
                       "s": 100,
                       "c": 1}.get(scale, 1)
+
     calc_price = staticmethod(calc_price)
 
     # Calculating weights based on predetermined scale
@@ -145,6 +148,7 @@ class Data():
                       "k": 1000,
                       "g": 1,
                       "m": 0.01}.get(scale, 1)
+
     calc_weight = staticmethod(calc_weight)
 
     # Calculating distances based on predetermined scale
@@ -153,12 +157,14 @@ class Data():
                       "m": 1,
                       "d": 0.1,
                       "c": 0.01}.get(scale, 1)
+
     calc_length = staticmethod(calc_length)
 
     # Calculating times based on predetermined scale
     def calc_time(val, scale):
         return val * {"t": 1,
                       "m": 4}.get(scale, 1)
+
     calc_time = staticmethod(calc_time)
 
     # Getter für einzelne Items als Objekte aus ========================================================================
@@ -176,6 +182,7 @@ class Data():
     def print_dict(item):
         for k, data in item.items():
             print(str(k) + ': ' + str(data))
+
     print_dict = staticmethod(print_dict)
 
     # prints all items
@@ -234,21 +241,21 @@ class Item(object):
     # prints the item data
     def print_data(self):
         print("Item | uuid: <" + str(self.uuid) + "> | itemid: <" + str(self.data['item_id']) + ">")
-        print(
-            str(self.data['level']) + " lvl | " + self.data['name'] + " | durability: " + str(self.data['durability']) +
-            "\n Weight: " + self.data['weight'] +
-            "\n Price: " + self.data['price'] +
-            "\n Specialtext: " + self.data['special_text'])
+        print("~ lvl | " + self.data['name'] + " | durability: " + str(self.data['durability']) +
+              "\n Weight: " + self.data['weight'] +
+              "\n Price: " + self.data['price'] +
+              "\n Specialtext: " + self.data['special_text'])
 
     # prints a list of all instanciated items
     def print_intanciated_items():
         for key, item in Item.instances.items():
             print(str(key) + " --> " + item.data['name'])
+
     print_intanciated_items = staticmethod(print_intanciated_items)
 
 
-# Parentclass vor all equipable items ==================================================================================
-class Equipable(Item):
+# Parentclass vor all upgradeable items ================================================================================
+class Upgradeable(Item):
     def __init__(self, item_id, item_data, level=1, upgrade_path=None, equiptime="1"):
         super().__init__(item_id, item_data)
         self.data['level'] = level
@@ -266,14 +273,14 @@ class Equipable(Item):
             if tree in self.data and str(level) in self.data['upgradepath'][tree]:
                 self.data[tree] = self.data[tree] + " (" + self.data['upgradepath'][tree][str(level)] + ")"
 
-    # applies the next x levels
+    # applies the next x level upgrades
     def apply_levels(self, limit=1):
         for i in range(self.data['level'], self.data['level'] + limit):
             self.level_up()
 
 
 # Class vor all weapons ================================================================================================
-class Weapon(Equipable):
+class Weapon(Upgradeable):
     def __init__(self, item_id, item_data, weapon_data, size='medium', level=0):
         super().__init__(item_id, item_data, level, upgrade_path=weapon_data['upgradepath'],
                          equiptime=weapon_data['equiptime'])
@@ -304,7 +311,7 @@ class Weapon(Equipable):
 
 
 # Class vor all equipments =============================================================================================
-class Equipment(Equipable):
+class Equipment(Upgradeable):
     def __init__(self, item_id, item_data, equipment_data, level=0):
         super().__init__(item_id, item_data, level, upgrade_path=equipment_data['upgradepath'],
                          equiptime=equipment_data['equiptime'])
@@ -408,7 +415,7 @@ class Player(object):
 
     # equips an item from the inventory based on a given index ===========
     def equip_from_inventory(self, index):
-        if isinstance(Item.instances[self.inventory['contents'][index]], Equipable):
+        if isinstance(Item.instances[self.inventory['contents'][index]], Upgradeable):
             return self.equip_item(self.remove_item_from_inventory(index))
         else:
             return False
@@ -433,11 +440,13 @@ class Player(object):
             print('--empty--')
         elif uuid in Item.instances:
             if full:
+                print()
                 Item.instances[uuid].print_data()
             else:
                 print(Item.instances[uuid].data['name'])
         else:
             print('--illegal uuid--')
+
     print_inventory_slot = staticmethod(print_inventory_slot)
 
     # prints player data =================================================
@@ -457,4 +466,4 @@ player.equip_from_inventory(index1)
 player.equip_from_inventory(index2)
 player.equip_from_inventory(index3)
 player.equip_item(game.equipment(5))
-player.print_inventory()
+player.print_inventory(full=True)
