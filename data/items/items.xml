@@ -35,4 +35,11 @@
         <special_text>Lightweight leather shoulderpads.</special_text>
         <durability>5000</durability>
     </item>
+    <item item_id="6">
+        <name>Steel Dagger</name>
+        <weight scale="k">1</weight>
+        <price scale="g">2.5</price>
+        <special_text>Small steel dagger.</special_text>
+        <durability>1000</durability>
+    </item>
 </items>
