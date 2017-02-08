@@ -22,16 +22,10 @@
     </stats>
     <inventory>
         <bag>
-            <item itemid="2" durability="0">Daddy's Pipe</item>
-            <item itemid="3" durability="200">none</item>
-            <weapon itemid="4" durability="100" level="1">test</weapon>
         </bag>
         <weapons>
-            <weapon itemid="4" durability="1000" level="1">none</weapon>
-            <weapon itemid="6" durability="500" level="GODHOOD">My Dick</weapon>
         </weapons>
         <equipments>
-            <equipment itemid="5" durability="4500" level="2">Invisibility Cloak</equipment>
         </equipments>
     </inventory>
 </data>

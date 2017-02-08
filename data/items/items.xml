@@ -10,26 +10,26 @@
     <item item_id="1">
         <name>Gauntlet</name>
 >       <price scale="g">2</price>
-        <weight scale="k">0,5</weight>
+        <weight scale="k">0.5</weight>
         <special_text>stylish Gauntlet for fierce bar fights</special_text>
         <durability>0</durability>
     </item>
     <item item_id="2">
         <name>Dagger</name>
         <price scale="g">2</price>
-        <weight scale="k">0,5</weight>
+        <weight scale="k">0.5</weight>
         <special_text> - </special_text>
         <durability>0</durability>
     </item>
     <item item_id="3">
-        <name>Gauntlet, spiked</name>
+        <name>Spiked Gauntlet</name>
         <price scale="g">5</price>
-        <weight scale="k">0,5</weight>
+        <weight scale="k">0.5</weight>
         <special_text> - </special_text>
         <durability>0</durability>
     </item>
     <item item_id="4">
-        <name>Mace, light</name>
+        <name>Mace. light</name>
         <price scale="g">5</price>
         <weight scale="k">2</weight>
         <special_text> - </special_text>
@@ -45,12 +45,12 @@
     <item item_id="6">
         <name>Club</name>
         <price scale="g">0</price>
-        <weight scale="k">1,5</weight>
+        <weight scale="k">1.5</weight>
         <special_text> - </special_text>
         <durability>0</durability>
     </item>
     <item item_id="7">
-        <name>Mace, heavy</name>
+        <name>Mace. heavy</name>
         <price scale="g">12</price>
         <weight scale="k">4</weight>
         <special_text> - </special_text>
@@ -66,7 +66,7 @@
     <item item_id="9">
         <name>Shortspear</name>
         <price scale="g">1</price>
-        <weight scale="k">1,5</weight>
+        <weight scale="k">1.5</weight>
         <special_text> - </special_text>
         <durability>0</durability>
     </item>
