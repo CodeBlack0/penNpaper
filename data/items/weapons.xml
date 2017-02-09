@@ -21,9 +21,17 @@
         <upgradepath>
             <attacks>
                 <attack type="blunt">
-                    <upgrade level="1">+1</upgrade>
-                    <upgrade level="2">+5</upgrade>
-                    <upgrade level="3">+10</upgrade>
+                    <damage>
+                        <upgrade level="1">+1</upgrade>
+                        <upgrade level="2">+5</upgrade>
+                        <upgrade level="3">+10</upgrade>
+                    </damage>
+                    <crittype>
+                        <upgrade level="GODHOOD">+ inifinity</upgrade>
+                    </crittype>
+                    <critmul>
+                        <upgrade level="GODHOOD">100% HP of enemy dealt as pure damage</upgrade>
+                    </critmul>
                 </attack>
             </attacks>
             <range>

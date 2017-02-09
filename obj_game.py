@@ -90,7 +90,17 @@ class Game(object):
             tree = dict()
             if upgradetree.tag == "attacks":
                 for attack in upgradetree:
-                    tree[attack.attrib['type']] = {x.attrib['level']: x.text for x in attack}
+                    attack_data = Data.reparse_nodes(attack)
+                    tree[attack.attrib['type']] = dict()
+                    if 'damage' in attack_data:
+                        tree[attack.attrib['type']]['damage'] = \
+                            {x.attrib['level']: x.text for x in attack_data['damage']}
+                    if 'critmul' in attack_data:
+                        tree[attack.attrib['type']]['critmul'] = \
+                            {x.attrib['level']: x.text for x in attack_data['critmul']}
+                    if 'crittype' in attack_data:
+                        tree[attack.attrib['type']]['crittype'] = \
+                            {x.attrib['level']: x.text for x in attack_data['crittype']}
             else:
                 for upgrade in upgradetree:
                     tree[upgrade.attrib['level']] = upgrade.text

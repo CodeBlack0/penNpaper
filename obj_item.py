@@ -27,7 +27,8 @@ class Item(object):
             Item.data_addresses.append(id(self.data))
 
     # subtracts a given value val from the items durability
-    def sub_durability(self, val): self.data['durability'] -= val
+    def sub_durability(self, val):
+        self.data['durability'] -= val
 
     # prints the item data
     def print_data(self):
@@ -69,10 +70,15 @@ class Upgradeable(Item):
             self.data['level'] = level
         for name, tree in self.data['upgradepath'].items():
             if name == "attacks":
-                for attack in tree:
-                    if str(level) in tree[attack]:
-                        self.data['attacks'][attack]['damage'] = \
-                            self.data['attacks'][attack]['damage'] + " (" + tree[attack][str(level)]['damage'] + ")"
+                for attack, attackdata in tree.items():
+                    if str(level) in attackdata['damage']:
+                        self.data['attacks'][attack]['damage'] = self.data['attacks'][attack]['damage'] + \
+                                                                 " (" + attackdata['damage'][str(level)] + ")"
+                    if str(level) in attackdata['crittype']:
+                        self.data['attacks'][attack]['crit']['type'] = self.data['attacks'][attack]['crit']['type'] + \
+                                                                       " (" + attackdata['crittype'][str(level)] + ")"
+                    if str(level) in attackdata['critmul']:
+                        self.data['attacks'][attack]['crit']['mul'] = attackdata['critmul'][str(level)]
             elif name in self.data and str(level) in self.data['upgradepath'][name]:
                 self.data[name] = self.data[name] + " (" + tree[str(level)] + ")"
 
