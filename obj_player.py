@@ -75,7 +75,7 @@ class Player(object):
             self.parse_weapon(child, equip=True)
 
     def parse_weapon(self, data, equip=False):
-        weapon = self.parent.weapon(int(data.attrib['itemid']))
+        weapon = self.parent.weapon(int(data.attrib['itemid']), size=data.attrib['size'])
         weapon.set_specific_save_data(data)
         if equip:
             self.equip_item(weapon)

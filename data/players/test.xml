@@ -26,8 +26,8 @@
             <item itemid="-1" durability="0">Dildo of Satan</item>
         </bag>
         <weapons>
-            <weapon itemid="2" durability="0" level="GODHOOD">My Dick</weapon>
-            <weapon itemid="2" durability="0" level="5">Dagger from Heaven</weapon>
+            <weapon itemid="2" durability="0" level="GODHOOD" size="big">My Dick</weapon>
+            <weapon itemid="2" durability="0" level="5" size="small">Dagger from Heaven</weapon>
         </weapons>
         <equipments>
         </equipments>

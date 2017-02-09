@@ -162,8 +162,8 @@ class Game(object):
     def item(self, item_id):
         return Item(item_id, self.items['itemdata'][item_id])
 
-    def weapon(self, item_id):
-        return Weapon(item_id, self.items['itemdata'][item_id], self.items['weapondata'][item_id])
+    def weapon(self, item_id, size="medium"):
+        return Weapon(item_id, self.items['itemdata'][item_id], self.items['weapondata'][item_id], size=size)
 
     def equipment(self, item_id):
         return Equipment(item_id, self.items['itemdata'][item_id], self.items['equipmentdata'][item_id])
