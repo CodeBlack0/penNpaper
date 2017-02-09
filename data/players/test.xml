@@ -22,12 +22,9 @@
     </stats>
     <inventory>
         <bag>
-            <item itemid="-1" durability="1000">Dild of Doom</item>
-            <item itemid="-1" durability="0">Dildo of Satan</item>
         </bag>
         <weapons>
-            <weapon itemid="2" durability="0" level="GODHOOD" size="big">My Dick</weapon>
-            <weapon itemid="2" durability="0" level="1" size="small">Dagger from Heaven</weapon>
+            <weapon itemid="-1" durability="0" level="GODHOOD" size="big">My Dick</weapon>
         </weapons>
         <equipments>
         </equipments>
