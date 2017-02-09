@@ -22,10 +22,12 @@
     </stats>
     <inventory>
         <bag>
-            <item itemid="-1" durability="1000">Dild of Doom</item>
-            <item itemid="-1" durability="0">Dildo of Satan</item>
+            <item itemid="-1" durability="1000">Dild of Doom 1</item>
+            <item itemid="-1" durability="0">Dildo of Satan 2</item>
         </bag>
         <weapons>
+            <weapon itemid="2" durability="0" level="GODHOOD">Dagger from Hell 1</weapon>
+            <weapon itemid="2" durability="0" level="5">Dagger from Heaven 2</weapon>
         </weapons>
         <equipments>
         </equipments>

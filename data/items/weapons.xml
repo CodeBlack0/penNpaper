@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <weapons>
-    <weapon item_id="4">
+    <weapon item_id="2">
         <type hands="1" ranged="0"></type>
         <damage very_small="1d2" small="2d2" medium="3d2" big="1d6" type="s"></damage>
         <crit type="1d2" mul="2"></crit>

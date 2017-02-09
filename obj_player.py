@@ -1,6 +1,7 @@
 from obj_data import Data
 from obj_item import Item, Weapon, Equipment, Upgradeable
 from obj_game import Game
+from copy import copy
 
 
 ########################################################################################################################
@@ -8,6 +9,7 @@ from obj_game import Game
 class Player(object):
     # dict all Player-instances
     instances = dict()
+    __slots__ = ['uuid', 'data', 'inventory', 'parent']
 
     def __init__(self, path=None, parent=None):
         self.uuid = id(self)
@@ -63,7 +65,8 @@ class Player(object):
                 self.parse_equipment(child)
 
     def parse_item(self, data):
-        item = self.parent.item(int(data.attrib['itemid']), save_data=data)
+        item = self.parent.item(int(data.attrib['itemid']))
+        item.set_specific_save_data(data)
         self.add_item_to_inventory(item)
 
     # parsing weapons ====================================================
@@ -72,7 +75,8 @@ class Player(object):
             self.parse_weapon(child, equip=True)
 
     def parse_weapon(self, data, equip=False):
-        weapon = self.parent.weapon(int(data.attrib['itemid']), save_data=data)
+        weapon = self.parent.weapon(int(data.attrib['itemid']))
+        weapon.set_specific_save_data(data)
         if equip:
             self.equip_item(weapon)
         else:
@@ -84,7 +88,8 @@ class Player(object):
             self.parse_equipment(child, equip=True)
 
     def parse_equipment(self, data, equip=False):
-        equipment = self.parent.equipment(int(data.attrib['itemid']), save_data=data)
+        equipment = self.parent.equipment(int(data.attrib['itemid']))
+        equipment.set_specific_save_data(data)
         if equip:
             self.equip_item(equipment)
         else:

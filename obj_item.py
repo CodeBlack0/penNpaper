@@ -1,4 +1,5 @@
 from obj_data import Data
+from copy import copy
 
 
 ########################################################################################################################
@@ -6,16 +7,24 @@ from obj_data import Data
 class Item(object):
     # dict vor all Item-instances
     instances = dict()
+    data_addresses = list()
     next_id = 0
+    __slots__ = ['data', 'uuid']
 
-    def __init__(self, item_id, item_data, save_data=None):
+    def __init__(self, item_id, item_data, regen_mem_location=True):
+        # Generate uuid for item and store it for accessing later on
         self.uuid = Item.next_id
         Item.next_id += 1
         Item.instances[self.uuid] = self
+        # 'loading' item data into data dict
+        item_data, item_id = copy(item_data), copy(item_id)
         self.data = item_data
         self.data['item_id'] = item_id
-        if save_data is not None:
-            self.set_specific_save_data(save_data)
+        # Generating indepent datadict memory location to avoid memory overlap
+        if regen_mem_location:
+            while id(self.data) in Item.data_addresses:
+                self.data = copy(self.data)
+            Item.data_addresses.append(id(self.data))
 
     # subtracts a given value val from the items durability
     def sub_durability(self, val): self.data['durability'] -= val
@@ -30,31 +39,24 @@ class Item(object):
 
     # loads item data from player inventory save
     def set_specific_save_data(self, savedata):
-        Item.print_all_instances("Pre changes")
         self.data['durability'] = savedata.attrib['durability']
-        Item.print_all_instances("durability")
         self.data['name'] = savedata.text if savedata.text != "none" else self.data['name']
-        Item.print_all_instances("name")
-
-
-    @staticmethod
-    def print_all_instances(text):
-        print("=========" + text + "=========")
-        for uuid, item in Item.instances.items():
-            #print(item)
-            print(id(item.data))
-            #item.print_data()
-            #print("=======")
 
 
 # Parentclass for all upgradeable items ================================================================================
 class Upgradeable(Item):
-    def __init__(self, item_id, item_data, level=1, upgrade_path=None, equiptime="1", save_data=None):
-        self.data = dict()
-        super().__init__(item_id, item_data, save_data=save_data)
+    def __init__(self, item_id, item_data, level=1, upgrade_path=None, equiptime="1", regen_mem_location=True):
+        super().__init__(item_id, item_data, regen_mem_location=False)
+        # 'loading' special data for upgradeables
+        level, upgrade_path, equiptime = copy(level), copy(upgrade_path), copy(equiptime)
         self.data['level'] = level
         self.data['upgradepath'] = upgrade_path if upgrade_path is not None else dict()
         self.data['equiptime'] = equiptime
+        # Generating indepent datadict memory location to avoid memory overlap
+        if regen_mem_location:
+            while id(self.data) in Item.data_addresses:
+                self.data = copy(self.data)
+            Item.data_addresses.append(id(self.data))
 
     # applies upgrade for either the next level or a given level
     def level_up(self, level=None):
@@ -85,10 +87,11 @@ class Upgradeable(Item):
 
 # Class for all weapons ================================================================================================
 class Weapon(Upgradeable):
-    def __init__(self, item_id, item_data, weapon_data, size='medium', level=0, save_data=None):
-        self.data = dict()
+    def __init__(self, item_id, item_data, weapon_data, size='medium', level=0):
         super().__init__(item_id, item_data, level, upgrade_path=weapon_data['upgradepath'],
-                         equiptime=weapon_data['equiptime'], save_data=save_data)
+                         equiptime=weapon_data['equiptime'], regen_mem_location=False)
+        # 'loading' special data for weapons
+        size, weapon_data = copy(size), copy(weapon_data)
         self.data['size'] = size
         self.data['weapon_type'] = weapon_data['type']
         self.data['base_damage'] = weapon_data['damage']
@@ -96,6 +99,10 @@ class Weapon(Upgradeable):
         self.data['damage'] = weapon_data['damage'][size]
         self.data['range'] = weapon_data['range']
         self.apply_levels(level)
+        # Generating indepent datadict memory location to avoid memory overlap
+        while id(self.data) in Item.data_addresses:
+            self.data = copy(self.data)
+        Item.data_addresses.append(id(self.data))
 
     # prints weapon and item data
     def print_data(self):
@@ -117,15 +124,20 @@ class Weapon(Upgradeable):
 
 # Class for all equipments =============================================================================================
 class Equipment(Upgradeable):
-    def __init__(self, item_id, item_data, equipment_data, level=0, save_data=None):
-        self.data = dict()
-        super().__init__(item_id, item_data, level, upgrade_path=equipment_data['upgradepath'],
-                         equiptime=equipment_data['equiptime'], save_data=save_data)
+    def __init__(self, item_id, item_data, equipment_data, level=0):
+        super().__init__(item_id, item_data, level=0, upgrade_path=equipment_data['upgradepath'],
+                         equiptime=equipment_data['equiptime'], regen_mem_location=False)
+        # 'loading' speical data for equipments
+        equipment_data = copy(equipment_data)
         self.data['spellfailing'] = equipment_data['spellfailing']
         self.data['armordeficit'] = equipment_data['armordeficit']
         self.data['maxdexbonus'] = equipment_data['maxdexbonus']
         self.data['armor'] = equipment_data['armor']
-        self.apply_levels(1)
+        self.apply_levels(level)
+        # Generating indepent datadict memory location to avoid memory overlap
+        while id(self.data) in Item.data_addresses:
+            self.data = copy(self.data)
+        Item.data_addresses.append(id(self.data))
 
     # prints equipment and item data
     def print_data(self):
