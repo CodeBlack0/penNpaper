@@ -7,5 +7,5 @@ from obj_item import Item
 game = Game()
 player = Player("data/players/test.xml")
 
-print(Item.data_addresses)
+player.inventory['weapons'][2].apply_levels(6)
 player.print_inventory(full=True)

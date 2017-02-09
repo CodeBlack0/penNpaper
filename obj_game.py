@@ -82,18 +82,18 @@ class Game(object):
         # Parsing Weapon data
         weapon['type'] = {'hands': data['type'].attrib['hands'],
                           'rangend': data['type'].attrib['ranged'] == "1"}
-        weapon['damage'] = {'very_small': data['damage'].attrib['very_small'],
-                            'small': data['damage'].attrib['small'],
-                            'medium': data['damage'].attrib['medium'],
-                            'big': data['damage'].attrib['big'],
-                            'type': data['damage'].attrib['type']}
+        weapon['attacks'] = data['attacks']
         weapon['range'] = str(self.calc_length(float(data['range'].text), data['range'].attrib['scale']))
         weapon['equiptime'] = str(self.calc_time(float(data['equiptime'].text), data['equiptime'].attrib['scale']))
         weapon['upgradepath'] = dict()
         for upgradetree in data['upgradepath']:
             tree = dict()
-            for upgrade in upgradetree:
-                tree[upgrade.attrib['level']] = upgrade.text
+            if upgradetree.tag == "attacks":
+                for attack in upgradetree:
+                    tree[attack.attrib['type']] = {x.attrib['level']: x.text for x in attack}
+            else:
+                for upgrade in upgradetree:
+                    tree[upgrade.attrib['level']] = upgrade.text
             weapon['upgradepath'][upgradetree.tag] = tree
         return weapon
 

@@ -67,9 +67,14 @@ class Upgradeable(Item):
             level = self.data['level']
         else:
             self.data['level'] = level
-        for tree in self.data['upgradepath']:
-            if tree in self.data and str(level) in self.data['upgradepath'][tree]:
-                self.data[tree] = self.data[tree] + " (" + self.data['upgradepath'][tree][str(level)] + ")"
+        for name, tree in self.data['upgradepath'].items():
+            if name == "attacks":
+                for attack in tree:
+                    if str(level) in tree[attack]:
+                        self.data['attacks'][attack]['damage'] = \
+                            self.data['attacks'][attack]['damage'] + " (" + tree[attack][str(level)]['damage'] + ")"
+            elif name in self.data and str(level) in self.data['upgradepath'][name]:
+                self.data[name] = self.data[name] + " (" + tree[str(level)] + ")"
 
     # applies the next x level upgrades
     def apply_levels(self, limit=1):
@@ -94,9 +99,9 @@ class Weapon(Upgradeable):
         size, weapon_data = copy(size), copy(weapon_data)
         self.data['size'] = size
         self.data['weapon_type'] = weapon_data['type']
-        self.data['base_damage'] = weapon_data['damage']
-        self.data['damage_type'] = weapon_data['damage']['type']
-        self.data['damage'] = weapon_data['damage'][size]
+        self.data['_attacks'] = {attack.attrib['type']: self.parse_attack(attack) for attack in weapon_data['attacks']}
+        self.data['attacks'] = {attack: {'damage': data['damage'][self.data['size']], 'crit': data['crit']}
+                                for attack, data in self.data['_attacks'].items()}
         self.data['range'] = weapon_data['range']
         self.apply_levels(level)
         # Generating indepent datadict memory location to avoid memory overlap
@@ -112,14 +117,22 @@ class Weapon(Upgradeable):
             "\n Weight: " + self.data['weight'] +
             "\n Price: " + self.data['price'] +
             "\n Specialtext: " + self.data['special_text'] +
-            "\n Damage: " + self.data['damage'] +
+            "\n Attacks: " + str(self.data['attacks']) +
             "\n Size: " + self.data['size'] +
             "\n Weapontype: " + str(self.data['weapon_type']) +
-            "\n Damagetype: " + self.data['damage_type'] +
             "\n Range: " + self.data['range'] +
             "\n Upgradepaths: ")
         for path in self.data['upgradepath']:
             print("   " + path + ": " + str(self.data['upgradepath'][path]))
+
+    # parseing attack type for weapon
+    @staticmethod
+    def parse_attack(raw_data):
+        data = Data.reparse_nodes(raw_data)
+        attack = dict()
+        attack['damage'] = {x.tag: x.text for x in data['damage']}
+        attack['crit'] = {x.tag: x.text for x in data['crit']}
+        return attack
 
 
 # Class for all equipments =============================================================================================
