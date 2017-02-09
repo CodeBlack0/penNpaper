@@ -8,4 +8,4 @@ game = Game()
 player = Player("data/players/test.xml")
 
 print(Item.data_addresses)
-player.print_inventory()
+player.print_inventory(full=True)
