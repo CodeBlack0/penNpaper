@@ -11,7 +11,7 @@ class Item(object):
     next_id = 0
     __slots__ = ['data', 'uuid']
 
-    def __init__(self, item_id, item_data, regen_mem_location=True):
+    def __init__(self, item_id, item_data, realloc=True):
         # Generate uuid for item and store it for accessing later on
         self.uuid = Item.next_id
         Item.next_id += 1
@@ -21,10 +21,8 @@ class Item(object):
         self.data = item_data
         self.data['item_id'] = item_id
         # Generating indepent datadict memory location to avoid memory overlap
-        if regen_mem_location:
-            while id(self.data) in Item.data_addresses:
-                self.data = copy(self.data)
-            Item.data_addresses.append(id(self.data))
+        if realloc:
+            self.realloc_mem_location()
 
     # subtracts a given value val from the items durability
     def sub_durability(self, val):
@@ -43,21 +41,26 @@ class Item(object):
         self.data['durability'] = savedata.attrib['durability']
         self.data['name'] = savedata.text if savedata.text != "none" else self.data['name']
 
+    # generates a new and independent memory location for the data-dict
+    def realloc_mem_location(self):
+            while id(self.data) in Item.data_addresses:
+                self.data = copy(self.data)
+            Item.data_addresses.append(id(self.data))
+
 
 # Parentclass for all upgradeable items ================================================================================
 class Upgradeable(Item):
-    def __init__(self, item_id, item_data, level=1, upgrade_path=None, equiptime="1", regen_mem_location=True):
-        super().__init__(item_id, item_data, regen_mem_location=False)
+    def __init__(self, item_id, item_data, level=1, upgrade_path=None, equiptime="1", realloc=True):
+        super().__init__(item_id, item_data, realloc=False)
         # 'loading' special data for upgradeables
         level, upgrade_path, equiptime = copy(level), copy(upgrade_path), copy(equiptime)
         self.data['level'] = level
         self.data['upgradepath'] = upgrade_path if upgrade_path is not None else dict()
         self.data['equiptime'] = equiptime
         # Generating indepent datadict memory location to avoid memory overlap
-        if regen_mem_location:
-            while id(self.data) in Item.data_addresses:
-                self.data = copy(self.data)
-            Item.data_addresses.append(id(self.data))
+        # Generating indepent datadict memory location to avoid memory overlap
+        if realloc:
+            self.realloc_mem_location()
 
     # applies upgrade for either the next level or a given level
     def level_up(self, level=None):
@@ -100,7 +103,7 @@ class Upgradeable(Item):
 class Weapon(Upgradeable):
     def __init__(self, item_id, item_data, weapon_data, size='medium', level=0):
         super().__init__(item_id, item_data, level, upgrade_path=weapon_data['upgradepath'],
-                         equiptime=weapon_data['equiptime'], regen_mem_location=False)
+                         equiptime=weapon_data['equiptime'], realloc=False)
         # 'loading' special data for weapons
         size, weapon_data = copy(size), copy(weapon_data)
         self.data['size'] = size
@@ -111,9 +114,7 @@ class Weapon(Upgradeable):
         self.data['range'] = weapon_data['range']
         self.apply_levels(level)
         # Generating indepent datadict memory location to avoid memory overlap
-        while id(self.data) in Item.data_addresses:
-            self.data = copy(self.data)
-        Item.data_addresses.append(id(self.data))
+        self.realloc_mem_location()
 
     # prints weapon and item data
     def print_data(self):
@@ -145,7 +146,7 @@ class Weapon(Upgradeable):
 class Equipment(Upgradeable):
     def __init__(self, item_id, item_data, equipment_data, level=0):
         super().__init__(item_id, item_data, level=0, upgrade_path=equipment_data['upgradepath'],
-                         equiptime=equipment_data['equiptime'], regen_mem_location=False)
+                         equiptime=equipment_data['equiptime'], realloc=False)
         # 'loading' speical data for equipments
         equipment_data = copy(equipment_data)
         self.data['spellfailing'] = equipment_data['spellfailing']
@@ -154,9 +155,7 @@ class Equipment(Upgradeable):
         self.data['armor'] = equipment_data['armor']
         self.apply_levels(level)
         # Generating indepent datadict memory location to avoid memory overlap
-        while id(self.data) in Item.data_addresses:
-            self.data = copy(self.data)
-        Item.data_addresses.append(id(self.data))
+        self.realloc_mem_location()
 
     # prints equipment and item data
     def print_data(self):

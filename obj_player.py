@@ -15,7 +15,7 @@ class Player(object):
         self.uuid = id(self)
         Player.instances[self.uuid] = self
         self.data = dict()
-        self.inventory = {
+        self.data['inventory'] = {
             "bag": {1: None, 2: None, 3: None, 4: None, 5: None, 6: None, 7: None, 8: None, 9: None, 10: None},
             "weapons": {1: None, 2: None, 3: None, 4: None, 5: None, 6: None},
             "equipments": {1: None, 2: None, 3: None, 4: None},
@@ -26,9 +26,8 @@ class Player(object):
             data = Data.reparse_nodes(raw_data)
             self.parse_stats(data['stats'])
             self.parse_inventory(data['inventory'])
-        except OSError as err:
-            print("Failed to initialize Player from " + str(path))
-            print(err)
+        except Exception as err:
+            print("Failed to initialize Player from " + str(path) + ", because: \n" + err)
 
     # Parsing data =====================================================================================================
     # Parsing player stats ===============================================
@@ -49,10 +48,13 @@ class Player(object):
 
     # Parsing players inventory ==========================================
     def parse_inventory(self, raw_data):
-        data = Data.reparse_nodes(raw_data)
-        self.parse_bag(data['bag'])
-        self.parse_weapons(data['weapons'])
-        self.parse_equipments(data['equipments'])
+        try:
+            data = Data.reparse_nodes(raw_data)
+            self.parse_bag(data['bag'])
+            self.parse_weapons(data['weapons'])
+            self.parse_equipments(data['equipments'])
+        except Exception as err:
+            print(err)
 
     # parsing bag ========================================================
     def parse_bag(self, raw_data):
@@ -97,34 +99,43 @@ class Player(object):
 
     # Inventory Managment ==============================================================================================
     # adds a given [items uuid/item uuid] to the inventory ===============
-    def add_item_to_inventory(self, item, slot='bag'):
-        if item in Item.instances:
-            item = Item.instances[item]
-        elif not isinstance(item, Item):
+    def add_item_to_inventory(self, item, position='bag', index=None):
+        # getting uuid
+        if isinstance(item, Item):
+            uuid = item.uuid
+        elif item in Item.instances:
+            uuid = item
+        elif item is not None:
             return False
-        for k, v in self.inventory[slot].items():
-            if v is None:
-                self.inventory[slot][k] = item
-                return k
+        # swap item with certian slot
+        if index is not None and index in self.data['inventory'][position]:
+            temp, self.data['inventory'][position][index] = \
+                self.data['inventory'][position][index], uuid
+            return temp if temp is not None else True
+        # regular insert into inventory
+        else:
+            for k, v in self.data['inventory'][position].items():
+                if v is None:
+                    self.data['inventory'][position][k] = uuid
+                    return k
         return False
 
     # removes a given index from the inventory and returns it ============
-    def remove_item_from_inventory(self, index, swap=None):
+    def remove_item_from_inventory(self, index):
         if index not in self.inventory['bag']:
             return False
-        temp, self.inventory['bag'][index] = self.inventory['bag'][index], swap
-        return temp
+        return self.add_item_to_inventory(None, position='bag', index=index)
 
     # equips a give [items uuid/item uuid] into the correct slot =========
-    def equip_item(self, uuid):
+    def equip_item(self, uuid, index=None):
         if isinstance(uuid, Item):
             uuid = uuid.uuid
         elif uuid not in Item.instances:
             return False
         if isinstance(Item.instances[uuid], Weapon):
-            return self.add_item_to_inventory(uuid, slot='weapons')
+            return self.add_item_to_inventory(uuid, position='weapons', index=index)
         if isinstance(Item.instances[uuid], Equipment):
-            return self.add_item_to_inventory(uuid, slot='equipments')
+            return self.add_item_to_inventory(uuid, position='equipments', index=index)
         else:
             return False
 
@@ -168,3 +179,9 @@ class Player(object):
     def print_data_dict(self):
         for k in self.data:
             print(k + ": " + str(self.data[k]))
+
+    # generates a new and independent memory location for the data-dict ==
+    def realloc_mem_location(self):
+            while id(self.data) in Item.data_addresses:
+                self.data = copy(self.data)
+            Item.data_addresses.append(id(self.data))
