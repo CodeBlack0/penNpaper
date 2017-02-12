@@ -37,21 +37,15 @@ class Utility(object):
             return Utility.Helper.to_float(x.text)
 
         @staticmethod
-        def to_scale(x, scales):
+        def to_scale(x, scale):
             try:
-                if not isinstance(scales, dict):
-                    raise Exception('Utility.Helper.to_scale: scale must be dict, is ' +
-                                    str(type(scales)) + ' --> ' + str(scales))
+                if not isinstance(scale, tuple):
+                    raise Exception('Utility.Helper.to_scale: scale must be tuple (format: ({units: fac}, [synonyms])\
+                                    , is ' + str(type(scale)) + ' --> ' + str(scale))
                 val = Utility.Helper.text_to_float(x)
 
-                # finding applicable scale
-                for size, scl in scales.items():
-                    if x.tag == size or x.tag in scl[1]:
-                        fac = scl[0][x.attrib['unit']]
-                        # print(Utility.Helper.to_float(x) * fac)
-                        break
-                else:
-                    return val
+                # finding conversionfacor
+                fac = scale[0][x.attrib['unit']] if x.tag in scale[1] else 1
 
                 # applying scale
                 return val * fac if isinstance(val, float) else val

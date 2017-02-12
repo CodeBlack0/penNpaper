@@ -84,7 +84,7 @@ class Parser(object):
             # internal format of the weaponnodes is parsed with this function
             def internalformat(x):
                 return {'hands': Utility.Helper.text_to_int(x),
-                        'equiptime': Utility.Helper.to_scale(x, scales=Parser.scales),
+                        'equiptime': Utility.Helper.to_scale(x, scale=Parser.scales['time']),
                         'attacks': Parser.elemtree_to_dict_by_attrib(x, name='attack', attribute='id', keyformat=int,
                                                                      internalformat=Parser.parse_attack),
                         'upgradepaths': Parser.elemtree_to_dict_by_attrib(x, name='upgradepath', attribute='type',
@@ -102,8 +102,8 @@ class Parser(object):
     def parse_attack(elemtree):
         try:
             def internalformat(x):
-                return {'range': Utility.Helper.to_scale(x, scales=Parser.scales),
-                        'executiontime': Utility.Helper.to_scale(x, scales=Parser.scales),
+                return {'range': Utility.Helper.to_scale(x, scale=Parser.scales['distance']),
+                        'executiontime': Utility.Helper.to_scale(x, scale=Parser.scales['time']),
                         'crit': Parser.elemtree_to_dict_by_name(x, internalformat=Utility.Helper.text),
                         'damage': Parser.elemtree_to_dict_by_name(x, internalformat=Utility.Helper.text),
                         'type': Utility.Helper.text(x)}[x.tag]
