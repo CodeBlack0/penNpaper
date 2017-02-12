@@ -23,7 +23,7 @@ class Parser(object):
             if ('parse_' + name) not in Parser.__dict__:
                 # returning standardised function
                 return Utility.curry(Parser.file_to_dict_by_attrib)(name=name.replace('data', ''), attribute='id',
-                                                                    internalformat=None, keyformat=int)
+                                                                    internalformat=Utility.Helper.text, keyformat=int)
             else:
                 # returning specific function
                 return Parser.__dict__['parse_' + name].__func__
@@ -38,7 +38,7 @@ class Parser(object):
             # internal format of the scalenodes is parsed with this function
             def internalformat(x):
                 return (Parser.elemtree_to_dict_by_attrib(x, attribute='symbol', name='unit',
-                                                          internalformat=Utility.Helper.to_float),
+                                                          internalformat=Utility.Helper.text_to_float),
                         x.attrib['synonyms'].split(', '))
 
             # parsing data
@@ -56,7 +56,7 @@ class Parser(object):
         try:
             # internal format of the spellnodes is parsed with this function
             internalformat = (Utility.curry(Parser.elemtree_to_dict_by_name)
-                              (keyformat=None, internalformat=Utility.Helper.to_float))
+                              (keyformat=None, internalformat=Utility.Helper.text_to_float))
             # parsing data
             return Parser.file_to_dict_by_attrib(path=path, attribute='id', name='spell', keyformat=int,
                                                  internalformat=internalformat)
@@ -69,7 +69,7 @@ class Parser(object):
         try:
             # internal format of the itemnodes is parsed with this function
             internalformat = (Utility.curry(Parser.elemtree_to_dict_by_name)
-                              (keyformat=None, internalformat=Utility.Helper.to_float))
+                              (keyformat=None, internalformat=Utility.Helper.text_to_float))
 
             # parsing data
             return Parser.file_to_dict_by_attrib(path=path, attribute='id', name='item', keyformat=int,
@@ -83,11 +83,12 @@ class Parser(object):
         try:
             # internal format of the weaponnodes is parsed with this function
             def internalformat(x):
-                return {'hands': Utility.Helper.to_int(x),
+                return {'hands': Utility.Helper.text_to_int(x),
                         'equiptime': Utility.Helper.to_scale(x, scales=Parser.scales),
                         'attacks': Parser.elemtree_to_dict_by_attrib(x, name='attack', attribute='id', keyformat=int,
                                                                      internalformat=Parser.parse_attack),
-                        'upgradepath': Parser.parse_upgradepath(x)}[x.tag]
+                        'upgradepaths': Parser.elemtree_to_dict_by_attrib(x, name='upgradepath', attribute='type',
+                                                                          internalformat=Parser.parse_upgradepath)}[x.tag]
 
             # parsing data
             return Parser.file_to_dict_by_attrib(path=path, attribute='id', name='weapon', keyformat=int,
@@ -115,7 +116,15 @@ class Parser(object):
     @staticmethod
     def parse_upgradepath(elemtree):
         try:
-            return elemtree
+            def internalformat(x):
+                if len(x) != 0:
+                    return Parser.elemtree_to_dict_by_name(x, internalformat=Utility.Helper.text)
+                else:
+                    return x.text
+
+            return Parser.elemtree_to_dict_by_attrib(elemtree, name='upgrade', attribute='level',
+                                                     keyformat=Utility.Helper.to_int, internalformat=internalformat)
+
         except Exception as err:
             print(err)
 
@@ -140,7 +149,7 @@ class Parser(object):
     Is parsed with this function:
     items = Utility.file_to_dict_by_attrib(path=path, attribute='id', name='item', keyformat=int,
                                            internalformat=(Utility.curry(Utility.elemtree_to_dict_by_name)
-                                                             (keyformat=None, internalformat=Utility.Helper.to_float)))
+                                                           (keyformat=None, internalformat=Utility.Helper.text_to_float)))
         --> 'file_to_dict_by_attrib' takes PATH, ATTRIBUTE, NAME, KEYFORMAT, and INTERNALFORMAT and
             parses the first layer (<item id='4'>...</item> --> {4: ...}. The INTERNALDATA (...) of this is another
             'elemtree' and the function aplies the given INTERNALFORMAT to it, which results in it being also parsed

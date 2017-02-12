@@ -17,16 +17,24 @@ class Utility(object):
         @staticmethod
         def to_int(x):
             try:
-                return int(x.text)
+                return int(x)
             except ValueError:
-                return x.text
+                return x
+
+        @staticmethod
+        def text_to_int(x):
+            return Utility.Helper.to_int(x.text)
 
         @staticmethod
         def to_float(x):
             try:
-                return float(x.text)
+                return float(x)
             except ValueError:
-                return x.text
+                return x
+
+        @staticmethod
+        def text_to_float(x):
+            return Utility.Helper.to_float(x.text)
 
         @staticmethod
         def to_scale(x, scales):
@@ -34,7 +42,7 @@ class Utility(object):
                 if not isinstance(scales, dict):
                     raise Exception('Utility.Helper.to_scale: scale must be dict, is ' +
                                     str(type(scales)) + ' --> ' + str(scales))
-                val = Utility.Helper.to_float(x)
+                val = Utility.Helper.text_to_float(x)
 
                 # finding applicable scale
                 for size, scl in scales.items():

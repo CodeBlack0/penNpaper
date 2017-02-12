@@ -20,29 +20,26 @@
                 <type>blunt</type>
             </attack>
         </attacks>
-        <upgradepath>
-            <upgrade type="attack">
-                <data id="0">
-                    <damage>
-                        <upgrade level="1">+1</upgrade>
-                        <upgrade level="2">+5</upgrade>
-                        <upgrade level="3">+10</upgrade>
-                    </damage>
-                    <crittype>
-                        <upgrade level="GODHOOD">+ inifinity</upgrade>
-                    </crittype>
-                    <critmul>
-                        <upgrade level="GODHOOD">100% HP of enemy dealt as pure damage</upgrade>
-                    </critmul>
-                </data>
-            </upgrade>
-            <upgrade type="range">
-                <upgrade level="5">+2</upgrade>
-            </upgrade>
-            <upgrade type="special_text">
+        <upgradepaths>
+            <upgradepath type="attack" id="'0">
+                <upgrade level="1">
+                    <damage>+1</damage>
+                </upgrade>
+                <upgrade level="2">
+                    <damage>+5</damage>
+                </upgrade>
+                <upgrade level="3">
+                    <damage>+10</damage>
+                    <range>+2</range>
+                </upgrade>
+                <upgrade level="GODHOOD">
+                    <crittype>+ inifinity</crittype>
+                </upgrade>
+            </upgradepath>
+            <upgradepath type="special_text">
                 <upgrade level="5">target gets poisend on crit for 1d3 over 3t</upgrade>
                 <upgrade level="GODHOOD">insta kill on every enemy pussy</upgrade>
-            </upgrade>
-        </upgradepath>
+            </upgradepath>
+        </upgradepaths>
     </weapon>
 </weapons>
