@@ -1,11 +1,21 @@
 <?xml version="1.0"?>
 <data>
-    <file name="feats">data/character_data/feats.xml</file>
-    <file name="races">data/character_data/races.xml</file>
-    <file name="skills">data/character_data/skills.xml</file>
-    <file name="spells">data/character_data/spells.xml</file>
-    <file name="talents">data/character_data/talents.xml</file>
-    <file name="equipments">data/items/equipments.xml</file>
-    <file name="items">data/items/items.xml</file>
-    <file name="weapons">data/items/weapons.xml</file>
+    <independent>
+        <file name="scales">data/scales.xml</file>
+        <file name="statedata">data/statedata.xml</file>
+        <file name="effectdata">data/effectdata.xml</file>
+        <file name="talentdata">data/talentdata.xml</file>
+        <file name="skilldata">data/skilldata.xml</file>
+        <file name="featdata">data/featdata.xml</file>
+    </independent>
+    <dependent>
+        <file name="itemdata">data/itemdata.xml</file>
+        <file name="weapondata">data/weapondata.xml</file>
+        <file name="equipmentdata">data/equipmentdata.xml</file>
+        <file name="magicitemdata">data/magicitemdata.xml</file>
+        <file name="spelldata">data/skilldata.xml</file>
+        <file name="racedata">data/racedata.xml</file>
+        <file name="beingdata">data/beingdata.xml</file>
+        <file name="petdata">data/petdata.xml</file>
+    </dependent>
 </data>

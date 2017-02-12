@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<equipments>
+    <equipment id="5">
+        <spellfailing>5</spellfailing>
+        <armordeficit>1</armordeficit>
+        <maxdexbonus>15</maxdexbonus>
+        <armor>2</armor>
+        <equiptime scale="m">1</equiptime>
+        <upgradepath>
+            <armor>
+                <upgrade level="1">+1</upgrade>
+                <upgrade level="2">+5</upgrade>
+                <upgrade level="3">+10</upgrade>
+                <upgrade level="GODHOOD">+1000</upgrade>
+            </armor>
+            <special_text>
+                <upgrade level="2">Makes wearer invisible for 3 turns at the beginning of combat.</upgrade>
+            </special_text>
+        </upgradepath>
+    </equipment>
+</equipments>

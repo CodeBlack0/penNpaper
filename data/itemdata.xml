@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<items>
+    <item id="-1">
+        <name>Dildo of God</name>
+        <price size="price" scale="g">10</price>
+        <weight size="weight" scale="k">1</weight>
+        <special_text>LONG BLACK PLASTIC SHLONG</special_text>
+        <durability>10</durability>
+    </item>
+    <item id="1">
+        <name>Gauntlet</name>
+>       <price size="price" scale="g">2</price>
+        <weight size="weight" scale="k">0.5</weight>
+        <special_text>stylish Gauntlet for fierce bar fights</special_text>
+        <durability>0</durability>
+    </item>
+    <item id="2">
+        <name>Dagger</name>
+        <price size="price" scale="g">2</price>
+        <weight size="weight" scale="k">0.5</weight>
+        <special_text> - </special_text>
+        <durability>0</durability>
+    </item>
+    <item id="3">
+        <name>Spiked Gauntlet</name>
+        <price size="price" scale="g">5</price>
+        <weight size="weight" scale="k">0.5</weight>
+        <special_text> - </special_text>
+        <durability>0</durability>
+    </item>
+    <item id="4">
+        <name>Light Mace</name>
+        <price size="price" scale="g">5</price>
+        <weight size="weight" scale="k">2</weight>
+        <special_text> - </special_text>
+        <durability>0</durability>
+    </item>
+    <item id="5">
+        <name>Sickle</name>
+        <price size="price" scale="g">6</price>
+        <weight size="weight" scale="k">1</weight>
+        <special_text> - </special_text>
+        <durability>0</durability>
+    </item>
+    <item id="6">
+        <name>Club</name>
+        <price size="price" scale="g">0</price>
+        <weight size="weight" scale="k">1.5</weight>
+        <special_text> - </special_text>
+        <durability>0</durability>
+    </item>
+    <item id="7">
+        <name>Heavy Mace</name>
+        <price size="price" scale="g">12</price>
+        <weight size="weight" scale="k">4</weight>
+        <special_text> - </special_text>
+        <durability>0</durability>
+    </item>
+    <item id="8">
+        <name>Morningstar</name>
+        <price size="price" scale="g">8</price>
+        <weight size="weight" scale="k">3</weight>
+        <special_text> - </special_text>
+        <durability>0</durability>
+    </item>
+    <item id="9">
+        <name>Shortspear</name>
+        <price size="price" scale="g">1</price>
+        <weight size="weight" scale="k">1.5</weight>
+        <special_text> - </special_text>
+        <durability>0</durability>
+    </item>
+</items>

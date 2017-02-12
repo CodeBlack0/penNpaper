@@ -1,11 +1,10 @@
-from obj_game import Game
-from obj_player import Player
-from obj_item import Item
+from obj_data import Data
+from obj_parser import Parser
 
-
-########################################################################################################################
-game = Game()
-player = Player("data/players/test.xml")
-
-player.print_inventory(full=True)
-
+data = Data('data_files.xml')
+for id, item in data.dependent['weapondata'].items():
+    print('ID:',id)
+    for stat, value in data.dependent['itemdata'][id].items():
+        print(stat, '-->', value)
+    for stat, value in item.items():
+        print(stat, '-->', value)

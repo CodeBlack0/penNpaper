@@ -1,7 +1,8 @@
-from obj_data import Data
-from obj_item import Item, Weapon, Equipment, Upgradeable
-from obj_game import Game
 from copy import copy
+
+from obj_game import Game
+from obj_item import Item, Weapon, Equipment, Upgradeable
+from old.obj_data import Data
 
 
 ########################################################################################################################

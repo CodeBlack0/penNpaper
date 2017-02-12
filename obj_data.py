@@ -1,48 +1,27 @@
-import xml.etree.ElementTree as ElemTree
-import os
-import functools
+from obj_utility import Utility
+from obj_parser import Parser
 
 
-########################################################################################################################
-# Class for all static functions
+# from obj_item import Item, Upgradeable, Weapon, Equipment
+
+
 class Data(object):
-    # Parsing XML File
-    @staticmethod
-    def parse_file(path):
-        try:
-            if not isinstance(path, str):
-                raise Exception('parse_file: path value not a string')
-            if not os.path.isfile(path):
-                raise Exception('parse_file: path not found')
-            return ElemTree.parse(path).getroot()
-        except Exception as ex:
-            print(ex)
+    __slots__ = ['independent', 'dependent']
 
-    # Parsed alle nodes im XML-Objekt in ein dictionary
-    @staticmethod
-    def reparse_nodes(root):
-        try:
-            if not isinstance(root, ElemTree.Element):
-                raise Exception(
-                    'reparse_nodes: root is not a xml.etree.ElementTree.Element, root is ' + str(type(root)))
-            raw_data = dict()
-            for i, child in enumerate(root):
-                raw_data[child.tag] = root[i]
-            return raw_data
-        except Exception as ex:
-            print(ex)
+    def __init__(self, path=None):
+        if path is None:
+            path = 'data_files.xml'
+        self.independent, self.dependent = dict(), dict()
 
-    # Prints a raw datadict
-    @staticmethod
-    def print_dict(item):
-        for k, data in item.items():
-            print(str(k) + ': ' + str(data))
+        # parsing 'data_files.xml' into a dict
+        files = Parser.file_to_dict_by_name(path, internalformat=(Utility.curry(Parser.elemtree_to_dict_by_attrib)
+                                                                  (attribute='name', name='file', keyformat=None,
+                                                                   internalformat=Utility.Helper.text)))
 
-    # checks if string is numeric
-    @staticmethod
-    def is_number(s):
-        try:
-            float(s)
-            return True
-        except ValueError:
-            return False
+        # parsing base independent data
+        for name, file in files['independent'].items():
+            self.independent[name] = Parser.parse(name, file)
+
+        # parsing dependent data
+        for name, file in files['dependent'].items():
+            self.dependent[name] = Parser.parse(name, file)

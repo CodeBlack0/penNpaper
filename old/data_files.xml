@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<data>
+    <file name="feats">data/character_data/feats.xml</file>
+    <file name="races">data/character_data/races.xml</file>
+    <file name="skills">data/character_data/skills.xml</file>
+    <file name="spells">data/character_data/spells.xml</file>
+    <file name="talents">data/character_data/talents.xml</file>
+    <file name="equipments">data/items/equipments.xml</file>
+    <file name="items">data/items/items.xml</file>
+    <file name="weapons">data/items/weapons.xml</file>
+</data>

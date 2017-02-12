@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<scales>
+    <scale label="weight" synonyms="">
+        <units>
+            <unit symbol="kg">1000</unit>
+            <unit symbol="g">1</unit>
+            <unit symbol="mg">0.001</unit>
+        </units>
+    </scale>
+    <scale label="time" synonyms="equiptime, executiontime">
+        <unit symbol="d">86400</unit>
+        <unit symbol="h">3600</unit>
+        <unit symbol="m">60</unit>
+        <unit symbol="s">1</unit>
+        <unit symbol="ms">0.001</unit>
+    </scale>
+    <scale label="distance" synonyms="range">
+        <unit symbol="km">1000</unit>
+        <unit symbol="m">1</unit>
+        <unit symbol="dm">0.1</unit>
+        <unit symbol="cm">0.01</unit>
+        <unit symbol="mm">0.001</unit>
+    </scale>
+</scales>
