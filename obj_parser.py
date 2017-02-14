@@ -4,14 +4,14 @@ from obj_utility import Utility
 
 
 class Parser(object):
-    __slots__ = ['scales']
+    __slots__ = ['scales', 'keys']
 
     # [UNIVERSAL PARSER] =====================================================
     @staticmethod
     def parse(name, path):
         try:
             func = Parser.get_parse_function(name)
-            print('parsing', name)
+            # print('parsing', name)
             return func(path)
         except Exception as err:
             print('parse(' + name + ', ' + path + ') generated: ', end='')
@@ -79,14 +79,13 @@ class Parser(object):
     @staticmethod
     def parse_weapondata(path):
         try:
-            # internal format of the weaponnodes is parsed with this function
+            # internal format of the weaponnodes
             def internalformat2(x):
                 return {'hands': Utility.Helper.text_to_int(x),
                         'equiptime': Utility.Helper.to_scale(x, scale=Parser.scales['time']),
-                        'attacks': Parser.elemtree_to_dict_by_attrib(x, name='attack', attribute='id', keyformat=int, internalformat=Parser.parse_attack),
-                        'upgradepaths': Parser.elemtree_to_dict_by_attrib(x, name='upgradepath', attribute='type', internalformat=Parser.parse_upgradepath)}[x.tag]
+                        'attacks': Parser.elemtree_to_dict_by_attrib(x, name='attack', attribute='type', keyformat=int, internalformat=Parser.parse_attack),
+                        'upgradepaths': Parser.elemtree_to_dict_by_attrib(x, name='upgradepath', attribute='value', internalformat=Parser.parse_upgradepath)}[x.tag]
 
-            # internal format
             def internalformat(x):
                 return Parser.elemtree_to_dict_by_name(x, keyformat=None, internalformat=internalformat2)
 
@@ -103,10 +102,41 @@ class Parser(object):
                 return {'range': Utility.Helper.to_scale(x, scale=Parser.scales['distance']),
                         'executiontime': Utility.Helper.to_scale(x, scale=Parser.scales['time']),
                         'crit': Parser.elemtree_to_dict_by_name(x, internalformat=Utility.Helper.text),
-                        'damage': Parser.elemtree_to_dict_by_name(x, internalformat=Utility.Helper.text),
-                        'type': Utility.Helper.text(x)}[x.tag]
+                        'damage': Parser.elemtree_to_dict_by_name(x, internalformat=Utility.Helper.text)}[x.tag]
 
             return Parser.elemtree_to_dict_by_name(elemtree, internalformat=internalformat)
+        except Exception as err:
+            print(err)
+
+    # parse the equipmentdata from an equipmentdata.xml
+    @staticmethod
+    def parse_equipmentdata(path):
+        try:
+            print('in equipment')
+
+            # internal format of the equipmentnodes
+            def internalformat2(x):
+                return {'spellfailing': Utility.Helper.text_to_int(x),
+                        'armordeficit': Utility.Helper.text_to_int(x),
+                        'maxdexbonus': Utility.Helper.text_to_int(x),
+                        'equiptime': Utility.Helper.to_scale(x, scale=Parser.scales['time']),
+                        'armorvalues': Parser.elemtree_to_dict_by_attrib(x, name='armor', attribute='type', keyformat=int, internalformat=Parser.parse_armor),
+                        'upgradepaths': Parser.elemtree_to_dict_by_attrib(x, name='upgradepath', attribute='value', internalformat=Parser.parse_upgradepath)}[x.tag]
+
+            def internalformat(x):
+                return Parser.elemtree_to_dict_by_name(x, keyformat=None, internalformat=internalformat2)
+
+            # parsing data
+            return Parser.file_to_dict_by_attrib(path=path, attribute='id', name='equipment', keyformat=int, internalformat=internalformat)
+        except Exception as err:
+            print(err)
+
+    @staticmethod
+    def parse_armor(elemtree):
+        try:
+            print('in armor')
+
+            return Parser.elemtree_to_dict_by_name(elemtree, internalformat=Utility.Helper.text)
         except Exception as err:
             print(err)
 
@@ -114,13 +144,25 @@ class Parser(object):
     @staticmethod
     def parse_upgradepath(elemtree):
         try:
+            print('in upgradepaths')
+
             def internalformat(x):
+                print('in upgradepath (format 1)')
                 if len(x) != 0:
                     return Parser.elemtree_to_dict_by_name(x, internalformat=Utility.Helper.text)
                 else:
                     return x.text
 
-            return Parser.elemtree_to_dict_by_attrib(elemtree, name='upgrade', attribute='level', keyformat=Utility.Helper.to_int, internalformat=internalformat)
+            def internalformat2(x):
+                print('in upgradepath (format 2)')
+                return Parser.elemtree_to_dict_by_attrib(x, name='upgrade', attribute='level', keyformat=Utility.Helper.to_int, internalformat=internalformat)
+
+            if elemtree[0].tag == "upgrade":
+                upgradepath = Parser.elemtree_to_dict_by_attrib(elemtree, name='upgrade', attribute='level', keyformat=Utility.Helper.to_int, internalformat=internalformat)
+            elif elemtree[0].tag == "type":
+                upgradepath = Parser.elemtree_to_dict_by_attrib(elemtree, name='type', attribute='id', keyformat=int, internalformat=internalformat2)
+
+            return upgradepath
 
         except Exception as err:
             print(err)

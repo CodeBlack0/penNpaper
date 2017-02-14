@@ -4,7 +4,7 @@
         <hands>1</hands>
         <equiptime unit="d">1</equiptime>
         <attacks>
-            <attack id='0'>
+            <attack type='0'><!-- damage type 0 is blunt impact damage -->
                 <damage>
                     <very_small>1d2</very_small>
                     <small>2d2</small>
@@ -17,26 +17,27 @@
                 </crit>
                 <range unit="m">1</range>
                 <executiontime unit="d">0.5</executiontime>
-                <type>blunt</type>
             </attack>
         </attacks>
         <upgradepaths>
-            <upgradepath type="attack" id="'0">
-                <upgrade level="1">
-                    <damage>+1</damage>
-                </upgrade>
-                <upgrade level="2">
-                    <damage>+5</damage>
-                </upgrade>
-                <upgrade level="3">
-                    <damage>+10</damage>
-                    <range>+2</range>
-                </upgrade>
-                <upgrade level="GODHOOD">
-                    <crittype>+ inifinity</crittype>
-                </upgrade>
+            <upgradepath value="attack" type="0">
+                <type id="0">
+                    <upgrade level="1">
+                        <damage>+1</damage>
+                    </upgrade>
+                    <upgrade level="2">
+                        <damage>+5</damage>
+                    </upgrade>
+                    <upgrade level="3">
+                        <damage>+10</damage>
+                        <range>+2</range>
+                    </upgrade>
+                    <upgrade level="GODHOOD">
+                        <crittype>+ inifinity</crittype>
+                    </upgrade>
+                </type>
             </upgradepath>
-            <upgradepath type="special_text">
+            <upgradepath value="special_text">
                 <upgrade level="5">target gets poisend on crit for 1d3 over 3t</upgrade>
                 <upgrade level="GODHOOD">insta kill on every enemy pussy</upgrade>
             </upgradepath>
