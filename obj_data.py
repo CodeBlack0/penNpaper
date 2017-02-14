@@ -25,3 +25,19 @@ class Data(object):
         # parsing dependent data
         for name, file in files['dependent'].items():
             self.dependent[name] = Parser.parse(name, file)
+
+    # ==[DEBUG]===============================================================
+    # prints all avialable weapon and and linked itemdata
+    def print_equipables(self, slot=['weapon', 'equipment']):
+        if slot is not None:
+            for n in slot:
+                print('~{ ' + n + 's }~')
+                for id, item in self.dependent[n + 'data'].items():
+                    print('ID:', id)
+                    for stat, value in self.dependent['itemdata'][id].items():
+                        print('[' + str(stat) + '] -->', value)
+                    for stat, value in item.items():
+                        if isinstance(value, dict):
+                            print('[' + str(stat) + '] ~~\\ \n' + "\n".join([str((i, j)) for i, j in value.items()]))
+                        else:
+                            print('[' + str(stat) + '] -->', value)
