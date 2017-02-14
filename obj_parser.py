@@ -6,11 +6,12 @@ from obj_utility import Utility
 class Parser(object):
     __slots__ = ['scales']
 
-    # [UNIVERSAL PARSER] ===============================================================================================
+    # [UNIVERSAL PARSER] =====================================================
     @staticmethod
     def parse(name, path):
         try:
             func = Parser.get_parse_function(name)
+            print('parsing', name)
             return func(path)
         except Exception as err:
             print('parse(' + name + ', ' + path + ') generated: ', end='')
@@ -22,28 +23,25 @@ class Parser(object):
             # checking if there is a specific function for this file
             if ('parse_' + name) not in Parser.__dict__:
                 # returning standardised function
-                return Utility.curry(Parser.file_to_dict_by_attrib)(name=name.replace('data', ''), attribute='id',
-                                                                    internalformat=Utility.Helper.text, keyformat=int)
+                return Utility.curry(Parser.file_to_dict_by_attrib)(name=name.replace('data', ''), attribute='id', internalformat=Utility.Helper.text, keyformat=int)
             else:
                 # returning specific function
                 return Parser.__dict__['parse_' + name].__func__
         except Exception as err:
             print(err)
 
-    # [SPECIFIC PARSERS] ===============================================================================================
+    # [SPECIFIC PARSERS] =====================================================
     # parses the scales from scales.xml
     @staticmethod
     def parse_scales(path):
         try:
             # internal format of the scalenodes is parsed with this function
             def internalformat(x):
-                return (Parser.elemtree_to_dict_by_attrib(x, attribute='symbol', name='unit',
-                                                          internalformat=Utility.Helper.text_to_float),
-                        x.attrib['synonyms'].split(', '))
+                return (Parser.elemtree_to_dict_by_attrib(x, attribute='symbol', name='unit', internalformat=Utility.Helper.text_to_float), x.attrib['synonyms'].split(', '))
 
             # parsing data
-            scales = Parser.file_to_dict_by_attrib(path=path, attribute='label', name='scale', keyformat=str,
-                                                   internalformat=internalformat)
+            scales = Parser.file_to_dict_by_attrib(path=path, attribute='label', name='scale', keyformat=str, internalformat=internalformat)
+
             # remember scales
             Parser.scales = scales
             return scales
@@ -55,8 +53,9 @@ class Parser(object):
     def parse_spelldata(path):
         try:
             # internal format of the spellnodes is parsed with this function
-            internalformat = (Utility.curry(Parser.elemtree_to_dict_by_name)
-                              (keyformat=None, internalformat=Utility.Helper.text_to_float))
+            def internalformat(x):
+                return Parser.elemtree_to_dict_by_name(x, keyformat=None, internalformat=Utility.Helper.text_to_float)
+
             # parsing data
             return Parser.file_to_dict_by_attrib(path=path, attribute='id', name='spell', keyformat=int,
                                                  internalformat=internalformat)
@@ -68,12 +67,11 @@ class Parser(object):
     def parse_itemdata(path):
         try:
             # internal format of the itemnodes is parsed with this function
-            internalformat = (Utility.curry(Parser.elemtree_to_dict_by_name)
-                              (keyformat=None, internalformat=Utility.Helper.text_to_float))
+            internalformat = (Utility.curry(Parser.elemtree_to_dict_by_name)(
+                keyformat=None, internalformat=Utility.Helper.text_to_float))
 
             # parsing data
-            return Parser.file_to_dict_by_attrib(path=path, attribute='id', name='item', keyformat=int,
-                                                 internalformat=internalformat)
+            return Parser.file_to_dict_by_attrib(path=path, attribute='id', name='item', keyformat=int, internalformat=internalformat)
         except Exception as err:
             print(err)
 
@@ -82,18 +80,18 @@ class Parser(object):
     def parse_weapondata(path):
         try:
             # internal format of the weaponnodes is parsed with this function
-            def internalformat(x):
+            def internalformat2(x):
                 return {'hands': Utility.Helper.text_to_int(x),
                         'equiptime': Utility.Helper.to_scale(x, scale=Parser.scales['time']),
-                        'attacks': Parser.elemtree_to_dict_by_attrib(x, name='attack', attribute='id', keyformat=int,
-                                                                     internalformat=Parser.parse_attack),
-                        'upgradepaths': Parser.elemtree_to_dict_by_attrib(x, name='upgradepath', attribute='type',
-                                                                          internalformat=Parser.parse_upgradepath)}[x.tag]
+                        'attacks': Parser.elemtree_to_dict_by_attrib(x, name='attack', attribute='id', keyformat=int, internalformat=Parser.parse_attack),
+                        'upgradepaths': Parser.elemtree_to_dict_by_attrib(x, name='upgradepath', attribute='type', internalformat=Parser.parse_upgradepath)}[x.tag]
+
+            # internal format
+            def internalformat(x):
+                return Parser.elemtree_to_dict_by_name(x, keyformat=None, internalformat=internalformat2)
 
             # parsing data
-            return Parser.file_to_dict_by_attrib(path=path, attribute='id', name='weapon', keyformat=int,
-                                                 internalformat=(Utility.curry(Parser.elemtree_to_dict_by_name))
-                                                 (keyformat=None, internalformat=internalformat))
+            return Parser.file_to_dict_by_attrib(path=path, attribute='id', name='weapon', keyformat=int, internalformat=internalformat)
         except Exception as err:
             print(err)
 
@@ -122,13 +120,12 @@ class Parser(object):
                 else:
                     return x.text
 
-            return Parser.elemtree_to_dict_by_attrib(elemtree, name='upgrade', attribute='level',
-                                                     keyformat=Utility.Helper.to_int, internalformat=internalformat)
+            return Parser.elemtree_to_dict_by_attrib(elemtree, name='upgrade', attribute='level', keyformat=Utility.Helper.to_int, internalformat=internalformat)
 
         except Exception as err:
             print(err)
 
-    # ==[BASIC PARSING FUNCTIONS]=======================================================================================
+    # ==[BASIC PARSING FUNCTIONS]=============================================
     '''
     Parser Formats:
   ----------------------------------------
@@ -163,8 +160,7 @@ class Parser(object):
     def xml_to_elemtree(path):
         try:
             if not isinstance(path, str):
-                raise Exception('parse_file: path value not a string, is: '
-                                + str(type(path)) + ' --> ' + str(path))
+                raise Exception('parse_file: path value not a string, is: ' + str(type(path)) + ' --> ' + str(path))
             if not os.path.isfile(path):
                 raise Exception('parse_file: path not found')
             return ElemTree.parse(path).getroot()
@@ -178,8 +174,7 @@ class Parser(object):
         try:
             # check if elemtree is of type ElemTree
             if not isinstance(elemtree, ElemTree.Element):
-                raise Exception('parse_elemtree_to_dict_by_name: elemtree value not a ElementTree, is: '
-                                + str(type(elemtree)) + ' --> ' + str(elemtree))
+                raise Exception('parse_elemtree_to_dict_by_name: elemtree value not a ElementTree, is: ' + str(type(elemtree)) + ' --> ' + str(elemtree))
 
             # setting formats if not set through parameters (standard format is identity function)
             keyformat = Utility.Helper.identity if keyformat is None else keyformat
@@ -210,8 +205,7 @@ class Parser(object):
         try:
             # check if elemtree is of type ElemTree
             if not isinstance(elemtree, ElemTree.Element):
-                raise Exception('parse_elemtree_to_dict_by_attribute: elemtree value not a ElementTree, is: '
-                                + str(type(elemtree)) + ' --> ' + str(elemtree))
+                raise Exception('parse_elemtree_to_dict_by_attribute: elemtree value not a ElementTree, is: ' + str(type(elemtree)) + ' --> ' + str(elemtree))
 
             # setting formats if not set through parameters (standard format is identity function)
             keyformat = Utility.Helper.identity if keyformat is None else keyformat
@@ -235,7 +229,6 @@ class Parser(object):
             elemtree = Parser.xml_to_elemtree(path)
 
             # elemtree to dict by attribute
-            return Parser.elemtree_to_dict_by_attrib(elemtree, attribute, name=name, keyformat=keyformat,
-                                                     internalformat=internalformat)
+            return Parser.elemtree_to_dict_by_attrib(elemtree, attribute, name=name, keyformat=keyformat, internalformat=internalformat)
         except Exception as err:
             print(err)

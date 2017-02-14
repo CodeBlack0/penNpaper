@@ -2,6 +2,7 @@ from obj_data import Data
 # from obj_utility import Utility
 # from obj_item import Item, Upgradeable, Weapon, Equipment
 
+
 class Game(object):
     __slots__ = ['used_uuids', 'players', 'gameobjects', 'npc', 'data']
 
