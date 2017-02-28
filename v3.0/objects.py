@@ -8,7 +8,7 @@ class GameObject(BaseClass):
     pass
 
 
-@debugmethodes
+@debugmethodes(prefix='***')
 class Item(GameObject):
     uuid = des.PositiveInteger()
     name = des.String()
@@ -17,7 +17,7 @@ class Item(GameObject):
     special_text = des.String()
 
 
-item = Item(0, 'test', weight=7, special_text='testing', price=1)
+item = Item(uuid=0, name='test', weight=7, special_text='testing', price=1)
 
 print(inspect.signature(Item))
 print(item.__dict__)

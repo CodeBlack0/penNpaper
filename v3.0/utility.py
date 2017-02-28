@@ -1,5 +1,4 @@
 from functools import wraps, partial
-from inspect import Parameter, Signature
 from descriptors import Descriptor
 
 
@@ -11,22 +10,28 @@ def debug(func=None, *, prefix=''):
 
     @wraps(func)
     def wrapper(*args, **kwargs):
-        print(msg + repr(args) + repr(kwargs))
+        print(msg)
         return func(*args, **kwargs)
     return wrapper
 
 
-def debugmethodes(cls, *, prefix=''):
+def debugmethodes(cls=None, *, prefix=''):
     ''' Applies debug-decorator to all methodes in class '''
+    if cls is None:
+        return partial(debugmethodes, prefix=prefix)
+
     for key, val in vars(cls).items():
         if callable(val):
             setattr(cls, key, debug(val, prefix=prefix))
     return cls
 
 
-def make_signature(names):
-    ''' Generates a signature object with given signature '''
-    return Signature(Parameter(name, Parameter.POSITIONAL_OR_KEYWORD) for name in names)
+def _make_init(fields):
+    ''' Generates init code based on the given fields '''
+    code = 'def __init__(self, %s):\n' % ','.join(fields)
+    for name in fields:
+        code += '   self.%s = %s\n' % (name, name)
+    return code
 
 
 class MetaClass(type):
@@ -40,15 +45,13 @@ class MetaClass(type):
         fields = [key for key, val in clsdict.items() if isinstance(val, Descriptor)]
         for name in fields:
             clsdict[name].name = name
+        if fields:
+            init_code = _make_init(fields)
+            exec(init_code, globals(), clsdict)
         clsobj = super().__new__(cls, name, bases, dict(clsdict))
-        sig = make_signature(fields)
-        setattr(clsobj, '__signature__', sig)
         return clsobj
 
 
 class BaseClass(metaclass=MetaClass):
     ''' Standard base class '''
-    def __init__(self, *args, **kwargs):
-        bound = self.__signature__.bind(*args, **kwargs)
-        for name, val in bound.arguments.items():
-            setattr(self, name, val)
+    pass

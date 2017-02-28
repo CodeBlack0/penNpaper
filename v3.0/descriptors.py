@@ -1,13 +1,35 @@
 import re
 
 
-class Descriptor:
+def _make_setter(dcls):
+    ''' Generates code for the setter function of a descriptor '''
+    code = 'def __set__(self, instance, value):\n'
+    for d in dcls.__mro__:
+        if 'set_code' in d.__dict__:
+            for line in d.set_code():
+                code += '    ' + line + '\n'
+    return code
+
+
+class DescriptorMeta(type):
+    ''' Metaclass for descriptors '''
+    def __init__(self, clsname, bases, clsdict):
+        super().__init__(clsname, bases, clsdict)
+        if '__set__' in clsdict:
+            raise TypeError('use set_code(), not __set__()')
+        code = _make_setter(self)
+        exec(code, globals(), clsdict)
+        setattr(self, '__set__', clsdict['__set__'])
+
+
+class Descriptor(metaclass=DescriptorMeta):
     ''' Descriptor-baseclass '''
     def __init__(self, name=None):
         self.name = name
 
-    def __set__(self, instance, value):
-        instance.__dict__[self.name] = value
+    @staticmethod
+    def set_code():
+        return ['instance.__dict__[self.name] = value']
 
     def __get__(self, instance):
         return instance.__dict__[self.name]
@@ -20,10 +42,10 @@ class Typed(Descriptor):
     ''' Typed descriptor-class '''
     ty = object
 
-    def __set__(self, instance, value):
-        if not isinstance(value, self.ty):
-            raise TypeError("Expected %s" % self.ty)
-        super().__set__(instance, value)
+    @staticmethod
+    def set_code():
+        return ['if not isinstance(value, self.ty):',
+                '    raise TypeError("Expected %s" % self.ty)']
 
 
 class Integer(Typed):
@@ -53,18 +75,18 @@ class String(Typed):
 
 class Positive(Descriptor):
     ''' Descriptor for Positive Values '''
-    def __set__(self, instance, value):
-        if value < 0:
-            raise ValueError('Must be >= 0')
-        super().__set__(instance, value)
+    @staticmethod
+    def set_code():
+        return ['if value < 0:',
+                '    raise ValueError("Must be >= 0")']
 
 
 class Negative(Descriptor):
     ''' Descriptor for Negative Values '''
-    def __set__(self, instance, value):
-        if value > 0:
-            raise ValueError('Must be <= 0')
-        super().__set__(instance, value)
+    @staticmethod
+    def set_code():
+        return ['if value > 0:',
+                '    raise ValueError("Must be <= 0")']
 
 
 class PositiveInteger(Integer, Positive):
@@ -89,10 +111,10 @@ class NegativeFloat(Float, Negative):
 
 class Number(Descriptor):
     ''' descriptor for numbers (i.e. integers and floats) '''
-    def __set__(self, instance, value):
-        if not isinstance(value, int) and not isinstance(value, float):
-            raise TypeError('Expected as number')
-        super().__set__(instance, float(value))
+    @staticmethod
+    def set_code():
+        return ['if not isinstance(value, int) and not isinstance(value, float):',
+                '    raise TypeError("Expected as number")']
 
 
 class PositiveNumber(Number, Positive):
@@ -111,10 +133,10 @@ class Sized(Descriptor):
         self.maxlen = maxlen
         super().__init__(*args, **kwargs)
 
-    def __set__(self, instance, value):
-        if len(value) > self.maxlen:
-            raise ValueError('Too big')
-        super().__set__(instance, value)
+    @staticmethod
+    def set_code():
+        return ['if len(value) > self.maxlen:',
+                '    raise ValueError("Too big")']
 
 
 class SizedString(String, Sized):
@@ -138,9 +160,9 @@ class FixedSized(Descriptor):
         self.size = size
         super().__init__(*args, **kwargs)
 
-    def __set__(self, instance, value):
-        if len(value) != self.size:
-            raise ValueError('Not the correct size')
+    def set_code():
+        return ['if len(value) != self.maxlen:',
+                '    raise ValueError("Not proper size")']
 
 
 class FixedSizedString(String, FixedSized):
@@ -164,10 +186,9 @@ class Regex(Descriptor):
         self.pat = re.compile(pat)
         super().__init__(*args, **kwargs)
 
-    def __set__(self, instance, value):
-        if not self.pat.match(value):
-            raise ValueError('Invalid string')
-        super().__set__(instance, value)
+    def set_code():
+        return ['if not self.pat.match(value):',
+                '    raise ValueError("Invalid string")']
 
 
 class RegexString(String, Regex):
