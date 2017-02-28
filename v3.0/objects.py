@@ -1,18 +1,14 @@
-from utility import MetaClass
+from utility import BaseClass, debugmethodes
 import descriptors as des
 import inspect
 
 
-class GameObject(metaclass=MetaClass):
-    ''' Baseclass for GameObjects '''
-    _fields = []
-
-    def __init__(self, *args, **kwargs):
-        bound = self.__signature__.bind(*args, **kwargs)
-        for name, val in bound.arguments.items():
-            setattr(self, name, val)
+class GameObject(BaseClass):
+    ''' Baseclass for gameobjects '''
+    pass
 
 
+@debugmethodes
 class Item(GameObject):
     uuid = des.PositiveInteger()
     name = des.String()

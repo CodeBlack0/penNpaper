@@ -44,3 +44,11 @@ class MetaClass(type):
         sig = make_signature(fields)
         setattr(clsobj, '__signature__', sig)
         return clsobj
+
+
+class BaseClass(metaclass=MetaClass):
+    ''' Standard base class '''
+    def __init__(self, *args, **kwargs):
+        bound = self.__signature__.bind(*args, **kwargs)
+        for name, val in bound.arguments.items():
+            setattr(self, name, val)
