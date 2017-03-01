@@ -362,6 +362,9 @@ def generate_custom_loader(func):
     return Loader
 
 
+# CUTOM IMPORTERS ----------------------------------------------------------------------------
+
+
 XMLLoader = generate_custom_loader(lambda loader, mod: exec(_xml_to_code(loader.filename), mod.__dict__, mod.__dict__))
 XMLImporter = generate_custom_importer(XMLLoader, '.xml')
 
