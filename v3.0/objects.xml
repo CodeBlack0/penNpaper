@@ -1,5 +1,5 @@
 <classes>
-    <class name='Item'>
+    <class name='Item' bases='BaseClass'>
         <field type='PositiveInteger'>uuid</field>
         <field type='String'>name</field>
         <field type='PositiveNumber'>price</field>
